@@ -2,23 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import { RateLimitError } from "realtime-ai";
+import {
+  ConnectionTimeoutError,
+  RateLimitError,
+  TransportAuthBundleError,
+} from "realtime-ai";
 import {
   useVoiceClient,
   useVoiceClientTransportState,
 } from "realtime-ai-react";
 
-//import Session from "./Session";
-import { Configure } from "./Setup";
 import { Alert } from "./ui/alert";
 import { Button } from "./ui/button";
 import * as Card from "./ui/card";
+import Session from "./Session";
+import { Configure } from "./Setup";
 
 const status_text = {
   idle: "Initializing...",
   initializing: "Initializing...",
   initialized: "Start",
-  handshaking: "Requesting agent...",
+  authenticating: "Requesting bot...",
   connecting: "Connecting...",
 };
 
@@ -66,16 +70,18 @@ export default function App() {
     try {
       // Disable the mic until the bot has joined
       voiceClient.enableMic(false);
+
       await voiceClient.start();
     } catch (e) {
       if (e instanceof RateLimitError) {
         setError("Demo is currently at capacity. Please try again later.");
+      } else if (e instanceof TransportAuthBundleError) {
+        setError(e.message);
+      } else if (e instanceof ConnectionTimeoutError) {
+        setError(e.message);
       } else {
-        setError(
-          "Unable to authenticate. Server may be offline or busy. Please try again later."
-        );
+        setError("Unknown error occurred");
       }
-      return;
     }
   }
 
@@ -94,7 +100,13 @@ export default function App() {
   }
 
   if (appState === "connected") {
-    return <div>Session in progress</div>;
+    return (
+      <Session
+        state={transportState}
+        onLeave={() => leave()}
+        startAudioOff={startAudioOff}
+      />
+    );
   }
 
   const isReady = appState === "ready";

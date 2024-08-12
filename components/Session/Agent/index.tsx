@@ -4,9 +4,6 @@ import { Loader2 } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
 
-import Latency from "@/components/Latency";
-
-//import TranscriptOverlay from "../TranscriptOverlay";
 import Avatar from "./avatar";
 import ModelBadge from "./model";
 
@@ -53,19 +50,12 @@ export const Agent: React.FC<{
           ) : (
             <Avatar />
           )}
-          {/*<TranscriptOverlay />*/}
         </div>
-        <footer className={styles.agentFooter}>
-          <Latency
-            started={hasStarted}
-            botStatus={botStatus}
-            statsAggregator={statsAggregator}
-          />
-        </footer>
       </div>
     );
   },
   (p, n) => p.isReady === n.isReady
 );
+Agent.displayName = "Agent";
 
 export default Agent;

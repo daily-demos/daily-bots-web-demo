@@ -159,4 +159,6 @@ export const Stats = React.memo(
   () => true
 );
 
+Stats.displayName = "Stats";
+
 export default Stats;

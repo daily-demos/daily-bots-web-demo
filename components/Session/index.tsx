@@ -35,7 +35,7 @@ export const Session = React.memo(
     // ---- Voice Client Events
 
     // Wait for the bot to enter a ready state and trigger it to say hello
-    useVoiceClientEvent(
+    /*useVoiceClientEvent(
       VoiceEvent.BotReady,
       useCallback(() => {
         voiceClient.appendLLMContext({
@@ -43,7 +43,7 @@ export const Session = React.memo(
           content: "Greet the user",
         });
       }, [voiceClient])
-    );
+    );*/
 
     useVoiceClientEvent(
       VoiceEvent.Metrics,
@@ -55,7 +55,7 @@ export const Session = React.memo(
     );
 
     useVoiceClientEvent(
-      VoiceEvent.BotStoppedTalking,
+      VoiceEvent.BotStoppedSpeaking,
       useCallback(() => {
         if (hasStarted) return;
 
@@ -156,7 +156,7 @@ export const Session = React.memo(
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => voiceClient.interrupt()}
+                  //onClick={() => voiceClient.interrupt()}
                 >
                   <StopCircle />
                 </Button>
@@ -198,5 +198,7 @@ export const Session = React.memo(
   },
   (p, n) => p.state === n.state
 );
+
+Session.displayName = "Session";
 
 export default Session;

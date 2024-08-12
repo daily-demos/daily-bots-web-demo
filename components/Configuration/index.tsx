@@ -1,8 +1,8 @@
 import React from "react";
-import { VoiceClientConfigOptions } from "realtime-ai";
+import { VoiceClientConfigOption } from "realtime-ai";
 import { useVoiceClient } from "realtime-ai-react";
 
-import { Voice } from "@/config";
+import { Voice } from "@/rtvi.config";
 
 import ModelSelect from "./ModelSelect";
 import VoiceSelect from "./VoiceSelect";
@@ -12,7 +12,7 @@ const Configuration: React.FC<{ showAllOptions: boolean }> = ({
 }) => {
   const voiceClient = useVoiceClient()!;
 
-  const updateConfig = (config: VoiceClientConfigOptions) => {
+  const updateConfig = (config: VoiceClientConfigOption[]) => {
     const updateOpts =
       voiceClient.state === "ready"
         ? { sendPartial: true }
@@ -22,19 +22,18 @@ const Configuration: React.FC<{ showAllOptions: boolean }> = ({
   };
 
   const handleVoiceChange = (voice: Voice) => {
-    updateConfig({
+    /*updateConfig({
       tts: { voice: voice.id },
-    });
-
+    });*/
     // Prompt the LLM to speak
-    voiceClient.appendLLMContext({
+    /*voiceClient.appendLLMContext({
       role: "assistant",
       content: "Ask if the user prefers the new voice you have been given.",
-    });
+    });*/
   };
 
   const handleModelChange = (model: string) => {
-    updateConfig({
+    /*updateConfig({
       llm: { model: model },
     });
 
@@ -47,7 +46,7 @@ const Configuration: React.FC<{ showAllOptions: boolean }> = ({
           content: `I just changed your model to use ${model}! Thank me for the change.`,
         });
       }, 500);
-    }
+    }*/
   };
 
   return (
