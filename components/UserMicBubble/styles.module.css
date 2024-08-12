@@ -1,0 +1,172 @@
+.bubbleContainer {
+  color: #ffffff;
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  position: relative;
+  z-index: 20;
+  padding-top: 20px;
+  @screen md {
+    padding-top: 0px;
+  }
+}
+
+.bubble {
+  position: relative;
+  cursor: pointer;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  z-index: 20;
+  transition: all 0.5s ease, opacity 2s ease;
+  border: 6px solid
+    color-mix(in srgb, theme(colors.primary.300), transparent 70%);
+  outline: 6px solid
+    color-mix(in srgb, theme(colors.primary.300), transparent 70%);
+  outline-offset: 0px;
+  opacity: 0.5;
+
+  background-color: theme(colors.primary.500);
+  background-image: radial-gradient(
+    theme(colors.primary.300),
+    theme(colors.primary.400)
+  );
+
+  @screen md {
+    width: 120px;
+    height: 120px;
+    border-radius: 120px;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    outline-width: 6px;
+  }
+  50% {
+    outline-width: 24px;
+  }
+  100% {
+    outline-width: 6px;
+  }
+}
+
+.icon {
+  position: relative;
+  z-index: 20;
+  opacity: 0.3;
+  transition: opacity 0.5s ease;
+  line-height: 1;
+}
+
+.canTalk {
+  opacity: 1;
+  background-color: theme(colors.primary.500);
+  background-image: radial-gradient(
+    theme(colors.primary.500),
+    theme(colors.primary.600)
+  );
+  border: 6px solid
+    color-mix(in srgb, theme(colors.primary.200), transparent 60%);
+  outline: 6px solid
+    color-mix(in srgb, theme(colors.primary.400), transparent 70%);
+  outline-offset: 4px;
+
+  .icon {
+    opacity: 1;
+  }
+}
+
+.blocked {
+  pointer-events: none;
+  cursor: disabled;
+}
+
+.muted {
+  opacity: 1;
+  background-color: theme(colors.red.500);
+  background-image: radial-gradient(
+    theme(colors.red.500),
+    theme(colors.red.600)
+  );
+  animation: pulseText 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border: 6px solid color-mix(in srgb, theme(colors.red.200), transparent 60%);
+  outline: 6px solid color-mix(in srgb, theme(colors.red.400), transparent 70%);
+
+  &:after {
+    content: "Unmute";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: theme(fontWeight.bold);
+    font-family: theme(fontFamily.mono);
+    text-transform: uppercase;
+    letter-spacing: theme(letterSpacing.wider);
+    color: theme(colors.red.100);
+  }
+}
+
+@keyframes pulseText {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.volume {
+  position: absolute;
+  overflow: hidden;
+  inset: 0px;
+  z-index: 0;
+  border-radius: 999px;
+  transition: all 0.1s ease;
+  transform: scale(0);
+  opacity: 0.5;
+  background-color: theme(colors.green.300);
+}
+
+/* Transcript */
+
+.transcript {
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  bottom: 0px;
+  flex: 0;
+  align-self: center;
+  opacity: 0.25;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  z-index: 999;
+  color: white;
+  background-color: color-mix(in srgb, theme(colors.gray.800), transparent 30%);
+  border-radius: theme(borderRadius.sm);
+  padding: 4px 8px;
+
+  &:global(.active) {
+    opacity: 1;
+  }
+}
+
+.typewriter {
+  display: flex;
+}
+
+.word {
+  display: inline-block;
+}

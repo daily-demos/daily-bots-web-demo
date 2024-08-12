@@ -1,0 +1,155 @@
+.agent {
+  padding: theme(spacing.2);
+  position: relative;
+}
+
+.agentWindow {
+  min-width: 400px;
+  aspect-ratio: 1;
+  background: theme(colors.primary.300);
+  border-radius: theme(borderRadius.2xl);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 2.5s;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    min-width: 0;
+  }
+}
+
+.connected {
+  background: theme(colors.primary.600);
+}
+
+.agentFooter {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 100%;
+
+  > :first-child {
+    border-right: 1px solid var(--color-gray-200);
+  }
+}
+
+.status {
+  flex: 1;
+  line-height: 1;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  gap: 0.5rem;
+
+  > span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0.7px;
+  }
+}
+
+.statusIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--borderRadius-xs);
+
+  > span {
+    display: block;
+    width: 9px;
+    height: 9px;
+    border-radius: 9px;
+    background: red;
+  }
+}
+
+.statusDefault {
+  color: var(--color-gray-500);
+  background: var(--color-gray-100);
+
+  > span {
+    background: var(--color-gray-400);
+  }
+}
+.statusOrange {
+  color: var(--color-orange-800);
+  background: var(--color-orange-100);
+
+  > span {
+    background: var(--color-orange-400);
+  }
+}
+.statusRed {
+  color: var(--color-red-800);
+  background: var(--color-red-100);
+
+  > span {
+    background: var(--color-red-400);
+  }
+}
+
+.statusGreen {
+  color: var(--color-green-800);
+  background: var(--color-green-100);
+
+  > span {
+    background: var(--color-green-400);
+  }
+}
+
+.loader {
+  padding: 12px;
+  display: inline-block;
+  line-height: 0;
+  background-color: theme(colors.primary.600);
+  border-radius: 99px;
+  color: white;
+  position: absolute;
+}
+
+.modelBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  text-align: center;
+  z-index: 99;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: theme(fontWeight.semibold);
+  color: theme(colors.primary.500);
+}
+
+.face {
+  animation: faceAppear 1s ease-out forwards;
+  position: relative;
+  z-index: 2;
+}
+
+.faceBubble {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  z-index: 1;
+  background-color: theme(colors.primary.700);
+  transition: transform 0.1s ease;
+}
+
+@keyframes faceAppear {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
