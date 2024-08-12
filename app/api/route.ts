@@ -10,10 +10,10 @@ export async function POST(request: Request) {
   const payload = {
     bot_profile: "voice-to-voice",
     services,
-    api_keys: [
-      { llm: process.env.TOGETHER_API_KEY },
-      { tts: process.env.CARTESIA_API_KEY },
-    ],
+    api_keys: {
+      together: process.env.TOGETHER_API_KEY,
+      cartesia: process.env.CARTESIA_API_KEY,
+    },
     config: [...config],
   };
 
