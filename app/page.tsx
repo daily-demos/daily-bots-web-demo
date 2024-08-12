@@ -7,7 +7,6 @@ import {
   defaultServices,
   defaultConfig,
   BOT_READY_TIMEOUT,
-  Voice,
 } from "@/rtvi.config";
 import { VoiceClientAudio, VoiceClientProvider } from "realtime-ai-react";
 import { DailyVoiceClient } from "realtime-ai-daily";

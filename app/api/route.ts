@@ -1,7 +1,7 @@
 export async function POST(request: Request) {
   const { services, config } = await request.json();
 
-  if (!services || !config) {
+  if (!services || !config || !process.env.DAILY_BOTS_URL) {
     return new Response(`Services or config not found on request body`, {
       status: 400,
     });
@@ -14,14 +14,22 @@ export async function POST(request: Request) {
       { llm: process.env.TOGETHER_API_KEY },
       { tts: process.env.CARTESIA_API_KEY },
     ],
-    config: {
-      ...config,
-    },
+    config: [...config],
   };
 
   console.log(payload);
 
-  // @TODO: call endpoint here
+  const req = await fetch(process.env.DAILY_BOTS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const res = await req.json();
+
+  console.log(res);
 
   return Response.json({ hello: "world" });
 }
