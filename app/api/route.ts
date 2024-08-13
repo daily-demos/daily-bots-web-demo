@@ -1,3 +1,7 @@
+// localhost/api [POST]
+
+import { defaultBotProfile } from "./../../rtvi.config";
+
 export async function POST(request: Request) {
   const { services, config } = await request.json();
 
@@ -8,7 +12,7 @@ export async function POST(request: Request) {
   }
 
   const payload = {
-    bot_profile: "voice-to-voice",
+    bot_profile: defaultBotProfile,
     services,
     api_keys: {
       together: process.env.TOGETHER_API_KEY,
