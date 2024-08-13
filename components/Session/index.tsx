@@ -26,7 +26,8 @@ interface SessionProps {
 export const Session = React.memo(
   ({ state, onLeave, startAudioOff = false }: SessionProps) => {
     const voiceClient = useVoiceClient()!;
-    const [hasStarted, setHasStarted] = useState(false);
+    const [hasStarted, setHasStarted] = useState(true);
+    //const [hasStarted, setHasStarted] = useState(false);
     const [showDevices, setShowDevices] = useState(false);
     const [showStats, setShowStats] = useState(false);
     const [muted, setMuted] = useState(startAudioOff);
@@ -54,20 +55,20 @@ export const Session = React.memo(
       }, [])
     );
 
-    useVoiceClientEvent(
+    /*useVoiceClientEvent(
       VoiceEvent.BotStoppedSpeaking,
       useCallback(() => {
         if (hasStarted) return;
 
         setHasStarted(true);
       }, [hasStarted])
-    );
+    );*/
 
     // ---- Effects
 
     useEffect(() => {
       // Reset started state on mount
-      setHasStarted(false);
+      // setHasStarted(false);
     }, []);
 
     useEffect(() => {
