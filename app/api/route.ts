@@ -21,6 +21,8 @@ export async function POST(request: Request) {
     config: [...config],
   };
 
+  console.log(payload);
+
   const req = await fetch(process.env.DAILY_BOTS_URL, {
     method: "POST",
     headers: {

@@ -51,7 +51,7 @@ export const llmModels: LLMModel[] = [
   { label: "Llama3 8b", id: "llama-3.1-8b-instant" },
 ];
 
-export const defaultBotProfile = "voice-to-voice";
+export const defaultBotProfile = "v2v_2024_08";
 
 export const defaultServices = {
   llm: "together",
