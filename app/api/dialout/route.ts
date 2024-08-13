@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.DAILY_API_KEY}`,
     },
     body: JSON.stringify(payload),
   });
