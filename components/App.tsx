@@ -6,6 +6,7 @@ import {
   ConnectionTimeoutError,
   RateLimitError,
   TransportAuthBundleError,
+  VoiceError,
 } from "realtime-ai";
 import {
   useVoiceClient,
@@ -28,7 +29,6 @@ const status_text = {
 
 export default function App() {
   const voiceClient = useVoiceClient()!;
-
   const transportState = useVoiceClientTransportState();
   const [appState, setAppState] = useState<
     "idle" | "connecting" | "connected" | "ready"
@@ -38,15 +38,14 @@ export default function App() {
 
   useEffect(() => {
     // Initialize local audio devices
-    if (!voiceClient || transportState !== "idle") return;
-    console.log("Initializing devices");
+    if (!voiceClient || appState !== "idle") return;
     voiceClient.initDevices();
-  }, [transportState, voiceClient]);
+  }, [appState, voiceClient]);
 
   useEffect(() => {
     // Update the app state based on the transport state
     // We only need a subset of states for the different views
-    // so this effect helps avoid inline conditionals.
+    // so this effect helps avoid excess inline conditionals.
     switch (transportState) {
       case "initialized":
         setAppState("ready");
@@ -81,15 +80,13 @@ export default function App() {
       } else if (e instanceof ConnectionTimeoutError) {
         setError(e.message);
       } else {
-        setError("Unknown error occurred");
+        setError((e as VoiceError).message || "Unknown error occured");
       }
     }
   }
 
   async function leave() {
     await voiceClient.disconnect();
-    // Reload the page to reset the app (this avoids transport specific reinitalizing issues)
-    window.location.reload();
   }
 
   if (error) {

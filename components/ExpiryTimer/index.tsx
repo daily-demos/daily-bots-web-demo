@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { clear } from "console";
 import { Timer } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
@@ -22,6 +23,14 @@ const ExpiryTimer: React.FC = () => {
     useCallback(() => setExp(voiceClient?.transportExpiry), [voiceClient])
   );
 
+  useVoiceClientEvent(
+    VoiceEvent.Disconnected,
+    useCallback(() => {
+      setExp(undefined);
+      setTime({ minutes: 0, seconds: 0 });
+    }, [])
+  );
+
   const noExpiry = !exp || exp === 0;
 
   useEffect(() => {
@@ -31,6 +40,7 @@ const ExpiryTimer: React.FC = () => {
 
     // Function to update time
     const updateTime = () => {
+      if (noExpiry) clearInterval(interval);
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const differenceInSeconds = futureTimestamp! - currentTimestamp;
       const minutes = Math.floor(differenceInSeconds / 60);
