@@ -12,14 +12,14 @@ const Configuration: React.FC<{ showAllOptions: boolean }> = ({
 }) => {
   const voiceClient = useVoiceClient()!;
 
-  const updateConfig = (config: VoiceClientConfigOption[]) => {
+  /*const updateConfig = (config: VoiceClientConfigOption[]) => {
     const updateOpts =
       voiceClient.state === "ready"
         ? { sendPartial: true }
         : { useDeepMerge: true };
 
     voiceClient.updateConfig(config, updateOpts);
-  };
+  };*/
 
   const handleVoiceChange = (voice: Voice) => {
     /*updateConfig({
