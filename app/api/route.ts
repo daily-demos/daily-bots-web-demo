@@ -4,7 +4,7 @@ import { defaultBotProfile } from "./../../rtvi.config";
 
 export async function POST(request: Request) {
   const { services, config } = await request.json();
-
+  console.log({ services, config });
   if (!services || !config || !process.env.DAILY_BOTS_URL) {
     return new Response(`Services or config not found on request body`, {
       status: 400,
