@@ -39,6 +39,7 @@ export default function App() {
   useEffect(() => {
     // Initialize local audio devices
     if (!voiceClient || transportState !== "idle") return;
+    console.log("Initializing devices");
     voiceClient.initDevices();
   }, [transportState, voiceClient]);
 
