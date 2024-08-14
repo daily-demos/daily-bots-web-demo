@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { clear } from "console";
 import { Timer } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
