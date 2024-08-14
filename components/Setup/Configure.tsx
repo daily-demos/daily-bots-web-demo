@@ -1,6 +1,5 @@
 import React from "react";
 
-import Configuration from "../Configuration";
 import HelpTip from "../ui/helptip";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
