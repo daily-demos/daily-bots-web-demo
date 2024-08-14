@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
   if (test) {
     // Webhook creation test response
-    return new Response("success", { status: 200 });
+    return new Response(JSON.stringify({ test: true }), { status: 200 });
   }
 
   if (!callId || !callDomain || !process.env.DAILY_BOTS_URL) {
@@ -47,5 +47,5 @@ export async function POST(request: Request) {
 
   const res = await req.json();
 
-  return new Response("success", { status: 200 });
+  return new Response(JSON.stringify({}), { status: 200 });
 }
