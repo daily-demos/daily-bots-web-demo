@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import Image from "next/image";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
 
@@ -19,7 +20,7 @@ export const Avatar: React.FC = () => {
 
   return (
     <>
-      <img src={FaceSVG} alt="Face" className={styles.face} />
+      <Image src={FaceSVG} alt="Face" className={styles.face} />
       <div className={styles.faceBubble} ref={volRef} />
     </>
   );
