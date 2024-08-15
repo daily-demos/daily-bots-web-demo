@@ -62,7 +62,11 @@ export const Session = React.memo(
       }, [hasStarted])
     );
 
+<<<<<<< HEAD
     voiceClient.handleFunctionCall(async (fn: FunctionCallParams) => {
+=======
+    voiceClient.handleFunctionCall((fn: LLMFunc) => {
+>>>>>>> function-calling
       console.log({ fn });
       return { conditions: "nice", temperature: 72 };
     });

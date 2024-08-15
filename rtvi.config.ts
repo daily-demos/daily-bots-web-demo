@@ -54,7 +54,7 @@ export const llmModels: LLMModel[] = [
 export const defaultBotProfile = "v2v_2024_08";
 
 export const defaultServices = {
-  llm: "anthropic",
+  llm: "openai",
   tts: "cartesia",
 };
 
@@ -67,68 +67,79 @@ export const defaultConfig = [
     service: "llm",
     options: [
       // or claude-3-5-sonnet-20240620
-      { name: "model", value: "claude-3-5-sonnet-20240620" },
+      { name: "model", value: "gpt-4o" },
       {
         name: "messages",
         value: [
           {
             // anthropic: user; openai: system
-            role: "user",
+
+            role: "system",
             content:
-              "You are a friendly TV weatherman named Wally. Your job is to tell me about the weather in any location I choose. Start by asking me the city I'd like the weather for. Once I've provided that, call the get_weather function to get weather information, and give me a summary of the day's forecast. You can reuse the data from the get_weather function to answer other questions I have about the weather. ",
+              "You are a cat named Clarissa. You can ask me anything. Keep response brief and legible. Start by telling me to ask for the weather in San Francisco.",
           },
         ],
       },
       // OpenAI
 
-      // {
-      //   name: "tools",
-      //   value: [
-      //     {
-      //       type: "function",
-      //       function: {
-      //         name: "get_current_weather",
-      //         description:
-      //           "Get the current weather for a location. This includes the conditions as well as the temperature.",
-      //         parameters: {
-      //           type: "object",
-      //           properties: {
-      //             location: {
-      //               type: "string",
-      //               description:
-      //                 "The city, state, and country, separated by commas. e.g. San Francisco,CA,US",
-      //             },
-      //           },
-      //           required: ["location"],
-      //         },
-      //       },
-      //     },
-      //   ],
-      // },
-
-      // Anthropic
-
       {
         name: "tools",
         value: [
           {
-            name: "get_weather",
-            description:
-              "Get the current weather for a location. This includes the conditions as well as the temperature.",
-            input_schema: {
-              type: "object",
-              properties: {
-                location: {
-                  type: "string",
-                  description:
-                    "The city, state, and country, separated by commas. e.g. San Francisco,CA,US",
+            type: "function",
+            function: {
+              name: "get_current_weather",
+              description:
+                "Get the current weather for a location. This includes the conditions as well as the temperature.",
+              parameters: {
+                type: "object",
+                properties: {
+                  location: {
+                    type: "string",
+                    description: "The city and state, e.g. San Francisco, CA",
+                  },
+                  format: {
+                    type: "string",
+                    enum: ["celsius", "fahrenheit"],
+                    description:
+                      "The temperature unit to use. Infer this from the users location.",
+                  },
                 },
+                required: ["location", "format"],
               },
-              required: ["location"],
             },
           },
         ],
       },
+
+      // Anthropic
+
+      // {
+      //   name: "tools",
+      //   value: [
+      //     {
+      //       name: "get_current_weather",
+      //       description:
+      //         "Get the current weather for a location. This includes the conditions as well as the temperature.",
+      //       input_schema: {
+      //         type: "object",
+      //         properties: {
+      //           location: {
+      //             type: "string",
+      //             description: "The city and state, e.g. San Francisco, CA",
+      //           },
+      //           format: {
+      //             type: "string",
+      //             enum: ["celsius", "fahrenheit"],
+      //             description:
+      //               "The temperature unit to use. Infer this from the users location.",
+      //           },
+      //         },
+      //         required: ["location", "format"],
+      //       },
+      //     },
+      //   ],
+      // },
     ],
   },
 ];
