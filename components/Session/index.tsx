@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { TransportState, VoiceEvent } from "realtime-ai";
+import { TransportState, VoiceEvent, FunctionCallParams } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -62,7 +62,7 @@ export const Session = React.memo(
       }, [hasStarted])
     );
 
-    voiceClient.handleFunctionCall((fn: LLMFunc) => {
+    voiceClient.handleFunctionCall(async (fn: FunctionCallParams) => {
       console.log({ fn });
       return { conditions: "nice", temperature: 72 };
     });
