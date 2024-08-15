@@ -68,7 +68,7 @@ export const defaultConfig = [
     options: [
       { name: "model", value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo" },
       {
-        name: "messages",
+        name: "initial_messages",
         value: [
           {
             role: "system",
@@ -77,6 +77,7 @@ export const defaultConfig = [
           },
         ],
       },
+      { name: "run_on_config", value: true },
     ],
   },
 ];
