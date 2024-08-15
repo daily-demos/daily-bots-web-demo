@@ -14,6 +14,7 @@ export async function POST(request: Request) {
   const payload = {
     bot_profile: defaultBotProfile,
     services,
+    max_duration: 600,
     api_keys: {
       together: process.env.TOGETHER_API_KEY,
       cartesia: process.env.CARTESIA_API_KEY,
