@@ -69,7 +69,7 @@ export const defaultConfig = [
       // or claude-3-5-sonnet-20240620
       { name: "model", value: "gpt-4o" },
       {
-        name: "messages",
+        name: "initial_messages",
         value: [
           {
             // anthropic: user; openai: system
@@ -80,6 +80,8 @@ export const defaultConfig = [
           },
         ],
       },
+      { name: "run_on_config", value: true },
+
       // OpenAI
 
       {
