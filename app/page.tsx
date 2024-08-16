@@ -36,6 +36,7 @@ export default function Home() {
   if (showSplash) {
     return <Splash handleReady={() => setShowSplash(false)} />;
   }
+
   return (
     <VoiceClientProvider voiceClient={voiceClientRef.current!}>
       <TooltipProvider>

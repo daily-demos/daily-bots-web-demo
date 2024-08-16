@@ -25,6 +25,7 @@ const status_text = {
 export default function App() {
   const voiceClient = useVoiceClient()!;
   const transportState = useVoiceClientTransportState();
+
   const [appState, setAppState] = useState<
     "idle" | "connecting" | "connected" | "ready"
   >("idle");
@@ -38,8 +39,8 @@ export default function App() {
   }, [appState, voiceClient]);
 
   useEffect(() => {
-    // Update the app state based on the transport state
-    // We only need a subset of states for the different views
+    // Update app state based on voice client transport state.
+    // We only need a subset of states to determine the ui state,
     // so this effect helps avoid excess inline conditionals.
     switch (transportState) {
       case "initialized":
@@ -64,6 +65,7 @@ export default function App() {
     // Join the session
     try {
       // Disable the mic until the bot has joined
+      // to avoid interrupting the bot's welcome message
       voiceClient.enableMic(false);
 
       await voiceClient.start();
@@ -77,6 +79,11 @@ export default function App() {
     await voiceClient.disconnect();
   }
 
+  /**
+   * UI States
+   */
+
+  // Error: show full screen message
   if (error) {
     return (
       <Alert intent="danger" title="An error occurred">
@@ -85,6 +92,7 @@ export default function App() {
     );
   }
 
+  // Connected: show session view
   if (appState === "connected") {
     return (
       <Session
@@ -95,6 +103,7 @@ export default function App() {
     );
   }
 
+  // Default: show setup view
   const isReady = appState === "ready";
 
   return (

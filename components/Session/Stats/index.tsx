@@ -7,8 +7,8 @@ import {
 } from "react-sparklines";
 import { X } from "lucide-react";
 
-import { Button } from "../ui/button";
-import HelpTip from "../ui/helptip";
+import { Button } from "../../ui/button";
+import HelpTip from "../../ui/helptip";
 
 import styles from "./styles.module.css";
 

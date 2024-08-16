@@ -17,8 +17,8 @@ const fontMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RTVI Web Client Demo",
-  description: "Example voice-to-voice demo built with RTVI",
+  title: "Daily Bots Demo",
+  description: "Daily Bots voice-to-voice example app",
 };
 
 export default function RootLayout({

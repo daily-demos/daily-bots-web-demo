@@ -8,16 +8,6 @@ type SplashProps = {
 };
 
 export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
-  const [isReady, setIsReady] = React.useState(true);
-
-  /*useEffect(() => {
-    const cacheVAD = async () => {
-      await VAD.precacheModels("silero_vad.onnx");
-      setIsReady(true);
-    };
-    cacheVAD();
-  }, []);*/
-
   return (
     <main className="w-full flex items-center justify-center bg-primary-200 p-4 bg-[length:auto_50%] lg:bg-auto bg-colorWash bg-no-repeat bg-right-top">
       <div className="flex flex-col gap-8 lg:gap-12 items-center max-w-full lg:max-w-3xl">
@@ -25,9 +15,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           Daily Bots demo
         </h1>
 
-        <Button onClick={handleReady} disabled={!isReady}>
-          {isReady ? "Try demo" : "Downloading assets..."}
-        </Button>
+        <Button onClick={() => handleReady()}>Try Demo</Button>
 
         <div className="h-[1px] bg-primary-300 w-full" />
 

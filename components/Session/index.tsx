@@ -5,14 +5,14 @@ import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
-import Configuration from "../Configuration";
-import Stats from "../Stats";
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import UserMicBubble from "../UserMicBubble";
 
 import Agent from "./Agent";
+import Configuration from "./Configuration";
+import Stats from "./Stats";
+import UserMicBubble from "./UserMicBubble";
 
 let stats_aggregator: StatsAggregator;
 
