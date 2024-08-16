@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
 import {
   ConnectionTimeoutError,
-  RateLimitError,
   TransportAuthBundleError,
   VoiceError,
 } from "realtime-ai";
@@ -73,9 +72,7 @@ export default function App() {
 
       await voiceClient.start();
     } catch (e) {
-      if (e instanceof RateLimitError) {
-        setError("Demo is currently at capacity. Please try again later.");
-      } else if (e instanceof TransportAuthBundleError) {
+      if (e instanceof TransportAuthBundleError) {
         setError(e.message);
       } else if (e instanceof ConnectionTimeoutError) {
         setError(e.message);

@@ -2,10 +2,6 @@ import { useCallback, useRef } from "react";
 import Image from "next/image";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
-<<<<<<< HEAD
-=======
-import Image from "next/image";
->>>>>>> function-calling
 import FaceSVG from "./face.svg";
 
 import styles from "./styles.module.css";

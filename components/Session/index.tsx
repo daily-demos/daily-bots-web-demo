@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { TransportState, VoiceEvent, FunctionCallParams } from "realtime-ai";
+import {
+  TransportState,
+  VoiceEvent,
+  FunctionCallParams,
+  LLMHelper,
+} from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -62,14 +67,23 @@ export const Session = React.memo(
       }, [hasStarted])
     );
 
-<<<<<<< HEAD
-    voiceClient.handleFunctionCall(async (fn: FunctionCallParams) => {
-=======
-    voiceClient.handleFunctionCall((fn: LLMFunc) => {
->>>>>>> function-calling
-      console.log({ fn });
-      return { conditions: "nice", temperature: 72 };
-    });
+    (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
+      async (fn: FunctionCallParams) => {
+        console.log({ fn });
+        if (fn.functionName === "get_weather" && fn.arguments?.location) {
+          const response = await fetch(
+            `/api/weather?location=${encodeURIComponent(
+              fn.arguments?.location
+            )}`
+          );
+          const json = await response.json();
+          console.log("weather:", json);
+          return json;
+        } else {
+          return { error: "couldn't fetch weather" };
+        }
+      }
+    );
 
     // ---- Effects
 
