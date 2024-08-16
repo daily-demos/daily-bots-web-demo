@@ -23,12 +23,7 @@ const TranscriptOverlay: React.FC = () => {
   useVoiceClientEvent(
     VoiceEvent.BotTranscript,
     useCallback((text: string) => {
-      const sentences = text.split("\n");
-      for (let i = 0; i < sentences.length; i++) {
-        setTimeout(() => {
-          setSentences((s) => [...s, sentences[i]]);
-        }, i * 2500);
-      }
+      setSentences((s) => [...s, text]);
     }, [])
   );
 

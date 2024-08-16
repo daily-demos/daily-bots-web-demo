@@ -68,8 +68,8 @@ export default function App() {
 
       await voiceClient.start();
     } catch (e) {
-      console.log(e);
       setError((e as VoiceError).message || "Unknown error occured");
+      voiceClient.disconnect();
     }
   }
 
