@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { VoiceEvent } from "realtime-ai";
+import { Transcript, VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
 
 import styles from "./styles.module.css";
@@ -22,8 +22,13 @@ const TranscriptOverlay: React.FC = () => {
 
   useVoiceClientEvent(
     VoiceEvent.BotTranscript,
-    useCallback((transcript) => {
-      setSentences((s) => [...s, transcript]);
+    useCallback((text: string) => {
+      const sentences = text.split("\n");
+      for (let i = 0; i < sentences.length; i++) {
+        setTimeout(() => {
+          setSentences((s) => [...s, sentences[i]]);
+        }, i * 2500);
+      }
     }, [])
   );
 

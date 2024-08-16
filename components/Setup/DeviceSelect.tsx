@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { Mic } from "lucide-react";
 import { useVoiceClientMediaDevices } from "realtime-ai-react";
 
-import { AudioIndicatorBar } from "../AudioIndicator";
 import { Field } from "../ui/field";
 import { Select } from "../ui/select";
+
+import { AudioIndicatorBar } from "./AudioIndicator";
 
 interface DeviceSelectProps {
   hideMeter: boolean;

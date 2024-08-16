@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { TransportState, VoiceEvent } from "realtime-ai";
+import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -34,20 +34,9 @@ export const Session = React.memo(
 
     // ---- Voice Client Events
 
-    // Wait for the bot to enter a ready state and trigger it to say hello
-    /*useVoiceClientEvent(
-      VoiceEvent.BotReady,
-      useCallback(() => {
-        voiceClient.appendLLMContext({
-          role: "assistant",
-          content: "Greet the user",
-        });
-      }, [voiceClient])
-    );*/
-
     useVoiceClientEvent(
       VoiceEvent.Metrics,
-      useCallback((metrics) => {
+      useCallback((metrics: PipecatMetrics) => {
         metrics?.ttfb?.map((m: { processor: string; value: number }) => {
           stats_aggregator.addStat([m.processor, "ttfb", m.value, Date.now()]);
         });
@@ -155,7 +144,13 @@ export const Session = React.memo(
                 <Button
                   variant="ghost"
                   size="icon"
-                  //onClick={() => voiceClient.interrupt()}
+                  onClick={() => {
+                    voiceClient.action({
+                      service: "tts",
+                      action: "interrupt",
+                      arguments: [],
+                    });
+                  }}
                 >
                   <StopCircle />
                 </Button>

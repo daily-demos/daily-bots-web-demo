@@ -4,6 +4,8 @@ import { Loader2 } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
 
+import TranscriptOverlay from "../TranscriptOverlay";
+
 import Avatar from "./avatar";
 import ModelBadge from "./model";
 
@@ -51,6 +53,7 @@ export const Agent: React.FC<{
             <Avatar />
           )}
         </div>
+        <TranscriptOverlay />
       </div>
     );
   },

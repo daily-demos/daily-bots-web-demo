@@ -40,5 +40,9 @@ export async function POST(request: Request) {
 
   const res = await req.json();
 
-  return new Response("success", { status: 200 });
+  if (req.status !== 200) {
+    return Response.json(res, { status: req.status });
+  }
+
+  return Response.json(res);
 }

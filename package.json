@@ -18,9 +18,9 @@
     "react": "^18",
     "react-dom": "^18",
     "react-sparklines": "^1.7.0",
-    "realtime-ai": "0.1.0",
-    "realtime-ai-react": "0.1.0",
-    "realtime-ai-daily": "0.1.0",
+    "realtime-ai": "0.1.2",
+    "realtime-ai-react": "0.1.2",
+    "realtime-ai-daily": "0.1.2",
     "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {

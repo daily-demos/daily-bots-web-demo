@@ -1,4 +1,4 @@
-import ExpiryTimer from "@/components/ExpiryTimer";
+import ExpiryTimer from "@/components/Header/ExpiryTimer";
 
 export function Header() {
   return (
