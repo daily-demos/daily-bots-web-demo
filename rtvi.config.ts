@@ -4,7 +4,7 @@ export const defaultBotProfile = "voice_2024_08";
 export const defaultMaxDuration = 600;
 
 export const defaultServices = {
-  llm: "together",
+  llm: "anthropic",
   tts: "cartesia",
 };
 
@@ -16,7 +16,7 @@ export const defaultConfig = [
   {
     service: "llm",
     options: [
-      { name: "model", value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo" },
+ //     { name: "model", value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo" },
       {
         name: "initial_messages",
         value: [
