@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import { VoiceError } from "realtime-ai";
+import { VoiceError, VoiceEvent, VoiceMessage } from "realtime-ai";
 import {
   useVoiceClient,
+  useVoiceClientEvent,
   useVoiceClientTransportState,
 } from "realtime-ai-react";
 
@@ -27,10 +28,17 @@ export default function App() {
   const transportState = useVoiceClientTransportState();
 
   const [appState, setAppState] = useState<
-    "idle" | "connecting" | "connected" | "ready"
+    "idle" | "ready" | "connecting" | "connected"
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [startAudioOff, setStartAudioOff] = useState<boolean>(false);
+
+  useVoiceClientEvent(
+    VoiceEvent.Error,
+    useCallback((message: VoiceMessage) => {
+      setError((message.data as { error: string; fatal: boolean }).error);
+    }, [])
+  );
 
   useEffect(() => {
     // Initialize local audio devices
@@ -122,6 +130,7 @@ export default function App() {
         <Configure
           startAudioOff={startAudioOff}
           handleStartAudioOff={() => setStartAudioOff(!startAudioOff)}
+          state={appState}
         />
       </Card.CardContent>
       <Card.CardFooter>
