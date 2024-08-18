@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Mic } from "lucide-react";
 import { ConfigOption, VoiceClientServices } from "realtime-ai";
 
 import { Field } from "@/components/ui/field";
@@ -28,7 +27,6 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
 
   useEffect(() => {
     const config: ConfigOption = { name: "model", value: llmModel };
-
     onConfigUpdate(config, { llm: llmProvider });
   }, [llmProvider, llmModel, onConfigUpdate]);
 
@@ -49,7 +47,6 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
             );
           }}
           value={llmProvider}
-          icon={<Mic size={24} />}
         >
           {llmProviders.map(({ value, label }) => (
             <option key={value} value={value}>
@@ -61,7 +58,6 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
         <Select
           onChange={(e) => setLlmModel(e.currentTarget.value)}
           value={llmModel}
-          icon={<Mic size={24} />}
         >
           {availableModels?.map(({ value, label }) => (
             <option key={value} value={value}>

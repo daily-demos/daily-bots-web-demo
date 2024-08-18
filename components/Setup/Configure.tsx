@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ConfigOption, VoiceClientServices } from "realtime-ai";
 import { useVoiceClient } from "realtime-ai-react";
 
@@ -8,6 +8,7 @@ import { Switch } from "../ui/switch";
 
 import ConfigSelect from "./ConfigSelect";
 import DeviceSelect from "./DeviceSelect";
+import Prompt from "./Prompt";
 
 interface ConfigureProps {
   startAudioOff: boolean;
@@ -18,28 +19,52 @@ interface ConfigureProps {
 export const Configure: React.FC<ConfigureProps> = React.memo(
   ({ startAudioOff, handleStartAudioOff, state }) => {
     const voiceClient = useVoiceClient()!;
+    const [showPrompt, setshowPrompt] = useState<boolean>(false);
+    const modalRef = useRef<HTMLDialogElement>(null);
 
-    const updateConfig = (
-      config: ConfigOption,
-      services: VoiceClientServices | undefined
-    ) => {
-      // Update config
-      const c = voiceClient.setServiceOptionInConfig("llm", config);
-      voiceClient.updateConfig(c);
+    useEffect(() => {
+      // Modal effect
+      // Note: backdrop doesn't currently work with dialog open, so we use setModal instead
+      const current = modalRef.current;
 
-      // We should only update services in ready app state (not when connnected)
-      // This try catch any errors if we accidently end up here
-      try {
-        if (services) {
-          voiceClient.services = { ...voiceClient.services, ...services };
-        }
-      } catch (e) {
-        return;
+      if (current && showPrompt) {
+        current.inert = true;
+        current.showModal();
+        current.inert = false;
       }
-    };
+      return () => current?.close();
+    }, [showPrompt]);
+
+    const updateConfig = useCallback(
+      (config: ConfigOption, services: VoiceClientServices | undefined) => {
+        const currentModel = voiceClient
+          .getServiceOptionsFromConfig("llm")
+          .options.find((o) => o.name === "model");
+
+        if (currentModel && currentModel.value !== config.value) {
+          const c = voiceClient.setServiceOptionInConfig("llm", config);
+          voiceClient.updateConfig(c);
+        }
+
+        // We should only update services in ready app state (not when connnected)
+        // This try catch any errors if we accidently end up here
+        try {
+          if (services && services.llm !== voiceClient.services.llm) {
+            voiceClient.services = { ...voiceClient.services, ...services };
+          }
+        } catch (e) {
+          return;
+        }
+      },
+      [voiceClient]
+    );
 
     return (
       <>
+        <dialog ref={modalRef}>
+          <Prompt handleClose={() => setshowPrompt(false)} />
+        </dialog>
+
         <section className="flex flex-col flex-wrap gap-3 lg:gap-4">
           <DeviceSelect hideMeter={false} />
           <ConfigSelect
@@ -48,6 +73,9 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
               updateConfig(config, services)
             }
           />
+          <span onClick={() => setshowPrompt(true)} className="cursor-pointer">
+            Show Prompt
+          </span>
         </section>
 
         <section className="flex flex-col gap-4 border-y border-primary-hairline py-4 mt-4">

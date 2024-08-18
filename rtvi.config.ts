@@ -75,6 +75,20 @@ export const LLM_MODEL_CHOICES = [
       },
     ],
   },
+  {
+    label: "Open AI",
+    value: "openai",
+    models: [
+      {
+        label: "GPT-4o Mini",
+        value: "gpt-4o-mini",
+      },
+      {
+        label: "GPT-4o",
+        value: "gpt-4o",
+      },
+    ],
+  },
 ];
 
 export const TTS_VOICES = [

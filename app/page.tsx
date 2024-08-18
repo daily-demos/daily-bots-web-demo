@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { LLMHelper } from "realtime-ai";
 import { DailyVoiceClient } from "realtime-ai-daily";
 import { VoiceClientAudio, VoiceClientProvider } from "realtime-ai-react";
 
@@ -29,6 +30,8 @@ export default function Home() {
       config: defaultConfig,
       timeout: BOT_READY_TIMEOUT,
     });
+    const llmHelper = new LLMHelper({});
+    voiceClient.registerHelper("llm", llmHelper);
 
     voiceClientRef.current = voiceClient;
   }, [showSplash]);

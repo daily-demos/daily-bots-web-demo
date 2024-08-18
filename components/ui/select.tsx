@@ -22,7 +22,7 @@ const selectVariants = cva(
 export interface SelectProps
   extends React.SelectHTMLAttributes<HTMLSelectElement>,
     VariantProps<typeof selectVariants> {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 export const Select: React.FC<SelectProps> = ({
