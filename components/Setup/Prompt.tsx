@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ConfigOption,
-  LLMContext,
   LLMContextMessage,
   LLMHelper,
   VoiceClientConfigOption,
@@ -29,12 +28,23 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
     defaultPrompt
   );
 
-  useEffect(() => {
+  function save() {
     if (!voiceClient) return;
 
-    const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-    console.log(llmHelper.getContext());
-  }, [voiceClient]);
+    voiceClient.setServiceOptionInConfig("llm", {
+      name: "initial_messages",
+      value: prompt,
+    });
+  }
+
+  const updateContextMessage = (index: number, content: string) => {
+    setPrompt((prev) => {
+      if (!prev) return prev;
+      const newPrompt = [...prev];
+      newPrompt[index].content = content;
+      return newPrompt;
+    });
+  };
 
   return (
     <Card.Card className="w-svw max-w-full md:max-w-md">
@@ -43,10 +53,17 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
       </Card.CardHeader>
       <Card.CardContent>
         {prompt?.map((message, i) => (
-          <p key={i}>{message.content}</p>
+          <div key={i}>
+            <strong>{message.role}</strong>
+            <textarea
+              defaultValue={message.content}
+              onChange={(e) => updateContextMessage(i, e.currentTarget.value)}
+            />
+          </div>
         ))}
       </Card.CardContent>
       <Card.CardFooter>
+        <Button onClick={() => save()}>Upate</Button>
         <Button onClick={handleClose}>Close</Button>
       </Card.CardFooter>
     </Card.Card>

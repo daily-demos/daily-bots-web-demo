@@ -22,8 +22,10 @@ export const defaultConfig = [
         value: [
           {
             role: "system",
-            content:
-              "You are a assistant called ExampleBot. You can ask me anything. Keep responses brief and legible. Introduce yourself first.",
+            content: `You are a assistant called ExampleBot. You can ask me anything.
+              Keep responses brief and legible.
+              Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.
+              Start by briefly introducing yourself.`,
           },
         ],
       },
