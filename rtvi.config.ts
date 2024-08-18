@@ -1,6 +1,6 @@
 export const BOT_READY_TIMEOUT = 15 * 1000; // 15 seconds
 
-export const defaultBotProfile = "voice_2024_08";
+export const defaultBotProfile = "vision_2024_08";
 export const defaultMaxDuration = 600;
 
 export const defaultServices = {
@@ -22,9 +22,19 @@ export const defaultConfig = [
         value: [
           {
             role: "system",
-            content:
-              "You are a assistant called ExampleBot. You can ask me anything. Keep responses brief and legible. Introduce yourself first.",
+            content: `You are a assistant called ExampleBot. You can ask me anything.
+
+Keep all responses brief. Use short sentences. Use only plain sentences and paragraphis with simple punctuation.
+
+You can answer questions about the user's video stream. The video stream is changing constantly, so you will usually need to use the tool to update your understanding whenever the user asks a question about the video.
+
+Be brief and to the point when you tell the user you will check the video stream. Say only a few words about what you need to do to respond to the user. For example,
+  - "I will check the video stream to answer that question."
+  - "Let me see whether {question}."
+  - "I will look into whether {question}, give me just a moment."
+`,
           },
+          { role: "user", content: "Say 'hello' to start the conversation." },
         ],
       },
       { name: "run_on_config", value: true },

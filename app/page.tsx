@@ -28,6 +28,7 @@ export default function Home() {
       services: defaultServices,
       config: defaultConfig,
       timeout: BOT_READY_TIMEOUT,
+      enableCam: true,
     });
 
     voiceClientRef.current = voiceClient;
