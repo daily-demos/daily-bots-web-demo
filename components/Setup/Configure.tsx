@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ConfigOption, VoiceClientServices } from "realtime-ai";
 import { useVoiceClient } from "realtime-ai-react";
 
+import { Button } from "../ui/button";
 import HelpTip from "../ui/helptip";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
@@ -73,9 +74,9 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
               updateConfig(config, services)
             }
           />
-          <span onClick={() => setshowPrompt(true)} className="cursor-pointer">
-            Show Prompt
-          </span>
+          <Button variant="light" size="sm" onClick={() => setshowPrompt(true)}>
+            Modify Prompt
+          </Button>
         </section>
 
         <section className="flex flex-col gap-4 border-y border-primary-hairline py-4 mt-4">
