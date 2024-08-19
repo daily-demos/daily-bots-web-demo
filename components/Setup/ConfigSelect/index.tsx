@@ -80,7 +80,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
 
   return (
     <div className="flex flex-col flex-wrap gap-4">
-      <Field label="Character present" error={false}>
+      <Field label="Character preset" error={false}>
         <div className="w-full flex flex-row gap-2">
           <Select
             disabled={!["ready", "idle"].includes(state)}
