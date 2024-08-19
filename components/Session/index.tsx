@@ -5,6 +5,7 @@ import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
+import LocalVideo from "../LocalVideo";
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -13,8 +14,6 @@ import Agent from "./Agent";
 import Configuration from "./Configuration";
 import Stats from "./Stats";
 import UserMicBubble from "./UserMicBubble";
-
-import LocalVideo from "../LocalVideo";
 
 let stats_aggregator: StatsAggregator;
 
@@ -98,7 +97,6 @@ export const Session = React.memo(
 
     return (
       <>
-
         <dialog ref={modalRef}>
           <Card.Card className="w-svw max-w-full md:max-w-md">
             <Card.CardHeader>
@@ -127,7 +125,6 @@ export const Session = React.memo(
             fullWidthMobile={false}
             className="w-full max-w-[320px] sm:max-w-[420px] mt-auto shadow-long"
           >
-
             <LocalVideo />
 
             <Agent
