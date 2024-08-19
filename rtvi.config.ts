@@ -1,6 +1,6 @@
 export const BOT_READY_TIMEOUT = 15 * 1000; // 15 seconds
 
-export const defaultBotProfile = "voice_2024_08";
+export const defaultBotProfile = "vision_2024_08";
 export const defaultMaxDuration = 600;
 
 export const defaultServices = {
@@ -34,7 +34,11 @@ Be brief and to the point when you tell the user you will check the video stream
   - "I will look into whether {question}, give me just a moment."
 `,
           },
-          { role: "user", content: "Say 'hello' to start the conversation." },
+          {
+            role: "user",
+            content:
+              "Say 'hello' to start the conversation. Tell the user you can answer questions about what you see on their camera.",
+          },
         ],
       },
       { name: "run_on_config", value: true },

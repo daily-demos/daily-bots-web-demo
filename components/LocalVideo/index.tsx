@@ -53,17 +53,8 @@ export default function LocalVideo() {
   (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
     async (fn: FunctionCallParams) => {
       console.log("Function call", fn);
-      if (localVideoTrack) {
-        let imageCapture = new imageCapture(localVideoTrack);
-      }
-      return {
-        type: "image",
-        source: {
-          type: "base64",
-          media_type: "image/jpeg",
-          data: "/9j/4AAQSkZJRg...",
-        },
-      };
+      var audio = new Audio("shutter.mp3");
+      audio.play();
     }
   );
 
