@@ -1,15 +1,11 @@
-import { useEffect, useRef, useCallback } from "react";
-import { LLMHelper, FunctionCallParams } from "realtime-ai";
-import {
-  useVoiceClientMediaTrack,
-  useVoiceClientEvent,
-  useVoiceClient,
-} from "realtime-ai-react";
+import { useEffect, useRef } from "react";
+import { FunctionCallParams, LLMHelper } from "realtime-ai";
+import { useVoiceClient, useVoiceClientMediaTrack } from "realtime-ai-react";
 
 export default function LocalVideo() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoTrack = useVoiceClientMediaTrack("video", "local");
-  const voiceClient = useVoiceClient();
+  const voiceClient = useVoiceClient()!;
   //
   // ---- LLMFunctionCall event: use to take UI action when our get_image
   //      function is executed on the bot. We don't need to send any
