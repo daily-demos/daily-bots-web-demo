@@ -31,9 +31,9 @@ const llmProviders = LLM_MODEL_CHOICES.map((choice) => ({
 }));
 
 const tileCX = cx(
-  "rounded-lg p-4 bg-white border border-primary-200 bg-white select-none ring-ring transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+  "*:opacity-50 cursor-pointer rounded-xl px-4 py-3 bg-white border border-primary-200 bg-white select-none ring-ring transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 );
-const tileActiveCX = cx("bg-primary-100 border-primary-300");
+const tileActiveCX = cx("*:opacity-100 bg-primary-100/70 border-transparent");
 
 export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   onConfigUpdate,
@@ -103,8 +103,8 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
         </div>
       </Field>
 
-      <Field label="LLM config:" error={false}>
-        <div className="flex flex-row gap-3">
+      <Field label="LLM options" error={false}>
+        <div className="flex flex-row gap-2">
           {llmProviders.map(({ value, label }) => (
             <div
               tabIndex={0}
@@ -122,6 +122,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
                 alt={label}
                 width="200"
                 height="60"
+                className="user-select-none pointer-events-none"
               />
             </div>
           ))}
