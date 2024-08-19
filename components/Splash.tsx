@@ -21,9 +21,9 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
         <footer className="flex flex-col lg:gap-2">
           <Button variant="light" asChild>
-            <a href="https://github.com/rtvi-ai" className="text-indigo-600">
+            <a href="https://docs.dailybots.ai" className="text-indigo-600">
               <Info className="size-6" />
-              Learn more about the RTVI standard
+              Learn more about Daily Bots
             </a>
           </Button>
 
