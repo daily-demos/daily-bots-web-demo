@@ -2572,24 +2572,24 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
-realtime-ai-daily@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/realtime-ai-daily/-/realtime-ai-daily-0.1.1.tgz#f022a152c02d6d26e8092a46eb40e5c3c98e0132"
-  integrity sha512-pnhn9giOGIIov/iMkdRZ5GB7VsmqxRvcmp5IoBrLvBOpM5XBOwoTehM90xPLYpFnC21Ssos2CMrRSpQt5gWP/w==
+realtime-ai-daily@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/realtime-ai-daily/-/realtime-ai-daily-0.1.5.tgz#d4d269a588fbae714416ddfe7a1ce93d94e603bf"
+  integrity sha512-Y0Lh2jh0jnVOOVhE51zBv/IQAExKTdi41PYEF5ze+IPuDK9Nh2hxgll/eguIm4LnfapqmO0avJ8d9rxOX5LEpQ==
   dependencies:
     "@daily-co/daily-js" ">=0.68.0"
 
-realtime-ai-react@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/realtime-ai-react/-/realtime-ai-react-0.1.1.tgz#2dc6b280613ef2f320cb422ed4c2bc2e36220ae9"
-  integrity sha512-L3HGzBOKNslonyq8RKTLRouz3pay03YO535v4bdjpuac9e5V/VLJ+DS/VFeeXgr54RO9gKwjkL496hfQLApPwA==
+realtime-ai-react@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/realtime-ai-react/-/realtime-ai-react-0.1.5.tgz#524becc389a1dd4655d73673a89883d2f2579088"
+  integrity sha512-2GeLbkAj19Xkq4ptAiDBBzJES104PjelKoDbKHXd0VGLaBGd4lEFOyId/2ldntTad+3NOARKYs3rTbbJE92kaA==
   dependencies:
     jotai "^2.9.0"
 
-realtime-ai@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/realtime-ai/-/realtime-ai-0.1.1.tgz#7615914b22dc6608934501933f962a0cfcdae86d"
-  integrity sha512-ORuFDl9b79yjy1HNaJZHmTEgCAOlA30sKAcNnwU3z+bGNf6NNYBZUnyCpATuYnE02VgWz/TYebTEzK3A+wm2LQ==
+realtime-ai@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/realtime-ai/-/realtime-ai-0.1.5.tgz#fdd7690469f0cffc41f1166a40f20ddb52762b90"
+  integrity sha512-kqK3UDXDpe8F+5QbpmsaAB/lwqqzQYvzbnGP3YGwKaX22c7iBP0vwpeXS2QDhq2AVMaYjt87SynqTBOH2WJCBQ==
   dependencies:
     "@types/events" "^3.0.3"
     deepmerge-ts "^7.0.3"
