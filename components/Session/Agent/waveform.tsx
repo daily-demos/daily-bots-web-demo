@@ -57,9 +57,9 @@ const WaveForm: React.FC = React.memo(() => {
       { startFreq: 4000, endFreq: 8000, smoothValue: 0 }, // Sibilance and high-frequency consonants
     ];
 
-    const barWidth = 24; // Fixed bar width
-    const barGap = 6; // Fixed gap between bars
-    const maxBarHeight = 80; // Set a maximum height for the bars
+    const barWidth = 30; // Fixed bar width
+    const barGap = 12; // Fixed gap between bars
+    const maxBarHeight = 160; // Set a maximum height for the bars
 
     const getFrequencyBinIndex = (frequency: number) => {
       const nyquist = audioContext.sampleRate / 2;
