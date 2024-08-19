@@ -29,6 +29,7 @@ const WaveForm: React.FC = React.memo(() => {
       canvas.style.width = `${containerWidth}px`;
       canvas.style.height = `${containerHeight}px`;
 
+      canvasCtx.lineCap = "round";
       canvasCtx.scale(scaleFactor, scaleFactor);
     };
 
