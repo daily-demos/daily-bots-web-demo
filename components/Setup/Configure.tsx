@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ConfigOption, VoiceClientServices } from "realtime-ai";
+import {
+  ConfigOption,
+  VoiceClientConfigOption,
+  VoiceClientServices,
+} from "realtime-ai";
 import { useVoiceClient } from "realtime-ai-react";
 
-import { Button } from "../ui/button";
 import HelpTip from "../ui/helptip";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
@@ -37,15 +40,14 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
     }, [showPrompt]);
 
     const updateConfig = useCallback(
-      (config: ConfigOption, services: VoiceClientServices | undefined) => {
-        const currentModel = voiceClient
-          .getServiceOptionsFromConfig("llm")
-          .options.find((o) => o.name === "model");
+      (
+        config: VoiceClientConfigOption[],
+        services: VoiceClientServices | undefined
+      ) => {
+        const newConfig: VoiceClientConfigOption[] =
+          voiceClient.partialToConfig(config);
 
-        if (currentModel && currentModel.value !== config.value) {
-          const c = voiceClient.setServiceOptionInConfig("llm", config);
-          voiceClient.updateConfig(c);
-        }
+        voiceClient.updateConfig(newConfig);
 
         // We should only update services in ready app state (not when connnected)
         // This try catch any errors if we accidently end up here
@@ -70,13 +72,9 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
           <DeviceSelect hideMeter={false} />
           <ConfigSelect
             state={state}
-            onConfigUpdate={(config, services) =>
-              updateConfig(config, services)
-            }
+            onModifyPrompt={() => setshowPrompt(true)}
+            onConfigUpdate={updateConfig}
           />
-          <Button variant="light" size="sm" onClick={() => setshowPrompt(true)}>
-            Modify Prompt
-          </Button>
         </section>
 
         <section className="flex flex-col gap-4 border-y border-primary-hairline py-4 mt-4">

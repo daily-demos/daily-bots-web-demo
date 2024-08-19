@@ -3,10 +3,9 @@ import {
   ConfigOption,
   LLMContextMessage,
   VoiceClientConfigOption,
+  VoiceEvent,
 } from "realtime-ai";
-import { useVoiceClient } from "realtime-ai-react";
-
-import { defaultConfig } from "@/rtvi.config";
+import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
@@ -16,18 +15,24 @@ type PromptProps = {
   handleClose: () => void;
 };
 
-const defaultPrompt: LLMContextMessage[] | undefined = defaultConfig
-  .find((c: VoiceClientConfigOption) => c.service === "llm")
-  ?.options?.find((o: ConfigOption) => o.name === "initial_messages")?.value as
-  | LLMContextMessage[]
-  | undefined;
-
 const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
   const voiceClient = useVoiceClient()!;
   const [prompt, setPrompt] = useState<LLMContextMessage[] | undefined>(
-    defaultPrompt
+    undefined
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+
+  useVoiceClientEvent(
+    VoiceEvent.ConfigUpdated,
+    (config: VoiceClientConfigOption[]) => {
+      const p = config
+        .find((c: VoiceClientConfigOption) => c.service === "llm")
+        ?.options?.find((o: ConfigOption) => o.name === "initial_messages")
+        ?.value as LLMContextMessage[] | undefined;
+
+      setPrompt(p);
+    }
+  );
 
   function save() {
     if (!voiceClient) return;
@@ -63,10 +68,7 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
                 {message.role}
               </span>
               <Textarea
-                defaultValue={message.content
-                  .split("\n")
-                  .map((line) => line.trim())
-                  .join("\n")}
+                value={message.content}
                 rows={prompt?.length <= 1 ? 10 : 5}
                 onChange={(e) => updateContextMessage(i, e.currentTarget.value)}
                 className="text-sm w-full whitespace-pre-wrap"

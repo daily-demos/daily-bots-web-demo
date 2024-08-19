@@ -1,13 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { ConfigOption, VoiceClientServices } from "realtime-ai";
+import {
+  ConfigOption,
+  VoiceClientConfigOption,
+  VoiceClientServices,
+} from "realtime-ai";
 
+import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
-import { LLM_MODEL_CHOICES } from "@/rtvi.config";
+import { LLM_MODEL_CHOICES, PRESET_CHARACTERS } from "@/rtvi.config";
+
+type CharacterData = {
+  name: string;
+  prompt: string;
+  voice: string;
+};
 
 interface ConfigSelectProps {
   state: string;
-  onConfigUpdate: (config: ConfigOption, services: VoiceClientServices) => void;
+  onConfigUpdate: (
+    config: VoiceClientConfigOption[],
+    services: VoiceClientServices
+  ) => void;
+  onModifyPrompt: () => void;
 }
 
 const llmProviders = LLM_MODEL_CHOICES.map((choice) => ({
@@ -18,17 +33,46 @@ const llmProviders = LLM_MODEL_CHOICES.map((choice) => ({
 
 export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   onConfigUpdate,
+  onModifyPrompt,
   state,
 }) => {
   const [llmProvider, setLlmProvider] = useState<string>(llmProviders[0].value);
   const [llmModel, setLlmModel] = useState<string>(
     llmProviders[0].models[0].value
   );
+  const [character, setCharacter] = useState<number>(0);
 
   useEffect(() => {
-    const config: ConfigOption = { name: "model", value: llmModel };
-    onConfigUpdate(config, { llm: llmProvider });
-  }, [llmProvider, llmModel, onConfigUpdate]);
+    const characterData = PRESET_CHARACTERS[character] as CharacterData;
+    const updateConfigOptions: VoiceClientConfigOption[] = [
+      {
+        service: "tts",
+        options: [{ name: "voice", value: characterData.voice }],
+      },
+      {
+        service: "llm",
+        options: [
+          {
+            name: "model",
+            value: llmModel,
+          },
+          {
+            name: "initial_messages",
+            value: [
+              {
+                role: "system",
+                content: characterData.prompt
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .join("\n"),
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    onConfigUpdate(updateConfigOptions, { llm: llmProvider });
+  }, [llmProvider, llmModel, character, onConfigUpdate]);
 
   const availableModels = LLM_MODEL_CHOICES.find(
     (choice) => choice.value === llmProvider
@@ -36,7 +80,25 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
 
   return (
     <div className="flex flex-col flex-wrap gap-4">
-      <Field label="LLM Config:" error={false}>
+      <Field label="Character present" error={false}>
+        <div className="w-full flex flex-row gap-2">
+          <Select
+            disabled={!["ready", "idle"].includes(state)}
+            className="flex-1"
+            onChange={(e) => setCharacter(parseInt(e.currentTarget.value))}
+          >
+            {PRESET_CHARACTERS.map(({ name }, i) => (
+              <option key={`char-${i}`} value={i}>
+                {name}
+              </option>
+            ))}
+          </Select>
+          <Button variant="light" onClick={onModifyPrompt}>
+            Customize
+          </Button>
+        </div>
+      </Field>
+      <Field label="LLM config:" error={false}>
         <Select
           disabled={!["ready", "idle"].includes(state)}
           onChange={(e) => {
