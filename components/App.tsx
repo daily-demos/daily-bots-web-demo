@@ -36,7 +36,9 @@ export default function App() {
   useVoiceClientEvent(
     VoiceEvent.Error,
     useCallback((message: VoiceMessage) => {
-      setError((message.data as { error: string; fatal: boolean }).error);
+      const errorData = message.data as { error: string; fatal: boolean };
+      if (!errorData.fatal) return;
+      setError(errorData.error);
     }, [])
   );
 
