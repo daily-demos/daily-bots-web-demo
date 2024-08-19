@@ -5,39 +5,94 @@ import {
   SparklinesLine,
   SparklinesReferenceLine,
 } from "react-sparklines";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import { current } from "tailwindcss/colors";
 
 import { Button } from "../../ui/button";
 import HelpTip from "../../ui/helptip";
 
 import styles from "./styles.module.css";
 
-const StatsHeader: React.FC<{ title: string }> = ({ title }) => {
-  return <header className={styles.statsHeader}>{title}</header>;
-};
-
 interface StatsProps {
   statsAggregator: StatsAggregator;
   handleClose: () => void;
 }
+
+const StatsTile = ({
+  service,
+  metric,
+  tip,
+  sub = "s",
+  multiplier = 3,
+  data,
+}: {
+  service: string;
+  sub?: string;
+  metric: string;
+  tip?: string;
+  multiplier?: number;
+  data: MetricValue;
+}) => {
+  return (
+    <div className={styles.serviceStat}>
+      <header>
+        <div className={styles.serviceName}>
+          {service.charAt(0).toUpperCase() + service.slice(1)} {metric}
+          {tip && <HelpTip text={tip} />}
+        </div>
+        <div className={styles.latest}>
+          <span>Latest</span>
+          <span className="font-medium">
+            {data.latest?.toFixed(multiplier)}
+            <sub>{sub}</sub>
+          </span>
+        </div>
+      </header>
+      <div className={styles.chart}>
+        <Sparklines
+          data={data.timeseries}
+          limit={20}
+          height={80}
+          svgHeight={80}
+        >
+          <SparklinesBars style={{ fill: "#41c3f9", fillOpacity: ".25" }} />
+          <SparklinesLine style={{ stroke: "#41c3f9", fill: "none" }} />
+          <SparklinesReferenceLine type="mean" />
+        </Sparklines>
+      </div>
+      <footer>
+        <div className={styles.statValue}>
+          H:
+          <span>
+            {data.high?.toFixed(multiplier)}
+            <sub>{sub}</sub>
+          </span>
+        </div>
+        <div className={styles.statValue}>
+          M:
+          <span>
+            {data.median?.toFixed(multiplier)}
+            <sub>{sub}</sub>
+          </span>
+        </div>
+        <div className={styles.statValue}>
+          L:
+          <span>
+            {data.low?.toFixed(multiplier)}
+            <sub>{sub}</sub>
+          </span>
+        </div>
+      </footer>
+    </div>
+  );
+};
 
 export const Stats = React.memo(
   ({ statsAggregator, handleClose }: StatsProps) => {
     const [currentStats, setCurrentStats] = useState<StatsMap>(
       statsAggregator.statsMap
     );
-    //const [ping, setPing] = useState<number | null>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-    /*
-    const sendAppMessage = useAppMessage({
-      onAppMessage: useCallback((ev: DailyEventObjectAppMessage) => {
-        // Aggregate metrics from pipecat
-        if (ev.data?.type === "latency-pong-pipeline-delivery") {
-          setPing(Date.now() - ev.data.ts);
-        }
-      }, []),
-    });*/
 
     useEffect(() => {
       if (intervalRef.current) {
@@ -55,18 +110,7 @@ export const Stats = React.memo(
       return () => clearInterval(intervalRef.current!);
     }, [statsAggregator]);
 
-    const numTurns = statsAggregator.turns;
-
-    /*
-    function sendPingRequest() {
-      // Send ping to get latency
-      sendAppMessage({ "latency-ping": { ts: Date.now() } }, "*");
-    }
-
-    const sumOfServices = Object.values(currentStats).reduce(
-      (acc, service) => acc + (service.ttfb.latest || 0),
-      0
-    );*/
+    //const numTurns = statsAggregator.turns;
 
     return (
       <div className={styles.container}>
@@ -81,76 +125,45 @@ export const Stats = React.memo(
           </Button>
         </div>
         <div className={styles.inner}>
-          <section className={styles.section}>
-            <StatsHeader title="Session" />
-            <div className={styles.networkStats}>
-              <div>
-                <h4 className={styles.monoHeader}>Turns</h4>
-                <span className="truncate">{numTurns}</span>
-              </div>
-            </div>
-          </section>
-
           <section className={styles.sectionServices}>
-            <StatsHeader title="Services" />
-            {currentStats &&
-              Object.entries(currentStats).map(([service, data]) => {
+            {Object.entries(currentStats).length < 1 ? (
+              <div>
+                <Loader2 className="animate-spin mx-auto" />
+              </div>
+            ) : (
+              Object.entries(currentStats).map(([service, data], index) => {
                 return (
-                  <div key={service} className={styles.serviceStat}>
-                    <header>
-                      <div className={styles.serviceName}>
-                        {service} TTFB <HelpTip text="Time to first byte" />
-                      </div>
-                      <div className={styles.latest}>
-                        <span>Latest</span>
-                        <span className="font-medium">
-                          {data.ttfb?.latest?.toFixed(3)}
-                          <sub>s</sub>
-                        </span>
-                      </div>
-                    </header>
-                    <div className={styles.chart}>
-                      <Sparklines
-                        data={data.ttfb?.timeseries}
-                        limit={20}
-                        height={80}
-                        svgHeight={80}
-                      >
-                        <SparklinesBars
-                          style={{ fill: "#41c3f9", fillOpacity: ".25" }}
-                        />
-                        <SparklinesLine
-                          style={{ stroke: "#41c3f9", fill: "none" }}
-                        />
-                        <SparklinesReferenceLine type="mean" />
-                      </Sparklines>
-                    </div>
-                    <footer>
-                      <div className={styles.statValue}>
-                        H:
-                        <span>
-                          {data.ttfb?.high?.toFixed(3)}
-                          <sub>s</sub>
-                        </span>
-                      </div>
-                      <div className={styles.statValue}>
-                        M:
-                        <span>
-                          {data.ttfb?.median?.toFixed(3)}
-                          <sub>s</sub>
-                        </span>
-                      </div>
-                      <div className={styles.statValue}>
-                        L:
-                        <span>
-                          {data.ttfb?.low?.toFixed(3)}
-                          <sub>s</sub>
-                        </span>
-                      </div>
-                    </footer>
+                  <div key={service} className={styles.serviceTiles}>
+                    <StatsTile
+                      key={`${service}-ttfb-${index}`}
+                      metric="TTFB"
+                      tip="Time to first byte"
+                      service={service}
+                      multiplier={3}
+                      data={data.ttfb}
+                    />
+                    {currentStats[service].characters && (
+                      <StatsTile
+                        key={`${service}-chars-${index}`}
+                        metric="Characters"
+                        sub=""
+                        service={service}
+                        multiplier={0}
+                        data={data.characters}
+                      />
+                    )}
+                    {currentStats[service].processing && (
+                      <StatsTile
+                        key={`${service}-proc-${index}`}
+                        metric="Processing"
+                        service={service}
+                        data={data.processing}
+                      />
+                    )}
                   </div>
                 );
-              })}
+              })
+            )}
           </section>
         </div>
       </div>

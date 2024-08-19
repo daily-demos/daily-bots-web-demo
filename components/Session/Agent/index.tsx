@@ -4,8 +4,6 @@ import { Loader2 } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
 
-import TranscriptOverlay from "../TranscriptOverlay";
-
 import ModelBadge from "./model";
 import WaveForm from "./waveform";
 
@@ -72,7 +70,6 @@ export const Agent: React.FC<{
             <WaveForm />
           )}
         </div>
-        <TranscriptOverlay />
       </div>
     );
   },

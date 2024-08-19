@@ -46,6 +46,22 @@ export const Session = React.memo(
         metrics?.ttfb?.map((m: { processor: string; value: number }) => {
           stats_aggregator.addStat([m.processor, "ttfb", m.value, Date.now()]);
         });
+        metrics?.characters?.map((m: { processor: string; value: number }) => {
+          stats_aggregator.addStat([
+            m.processor,
+            "characters",
+            m.value,
+            Date.now(),
+          ]);
+        });
+        metrics?.processing?.map((m: { processor: string; value: number }) => {
+          stats_aggregator.addStat([
+            m.processor,
+            "processing",
+            m.value,
+            Date.now(),
+          ]);
+        });
       }, [])
     );
 
