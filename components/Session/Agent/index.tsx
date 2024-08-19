@@ -20,6 +20,7 @@ export const Agent: React.FC<{
     const [botStatus, setBotStatus] = useState<
       "initializing" | "connected" | "disconnected"
     >("initializing");
+    const [botIsTalking, setBotIsTalking] = useState<boolean>(false);
 
     useEffect(() => {
       // Update the started state when the transport enters the ready state
@@ -36,10 +37,28 @@ export const Agent: React.FC<{
       }, [])
     );
 
+    useVoiceClientEvent(
+      VoiceEvent.BotStartedSpeaking,
+      useCallback(() => {
+        setBotIsTalking(true);
+      }, [])
+    );
+
+    useVoiceClientEvent(
+      VoiceEvent.BotStoppedSpeaking,
+      useCallback(() => {
+        setBotIsTalking(false);
+      }, [])
+    );
+
     // Cleanup
     useEffect(() => () => setHasStarted(false), []);
 
-    const cx = clsx(styles.agentWindow, hasStarted && styles.ready);
+    const cx = clsx(
+      styles.agentWindow,
+      hasStarted && styles.ready,
+      botIsTalking && styles.talking
+    );
 
     return (
       <div className={styles.agent}>

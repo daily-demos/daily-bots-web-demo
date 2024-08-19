@@ -18,8 +18,10 @@ const WaveForm: React.FC = React.memo(() => {
 
     // Make canvas fill the width and height of its container
     const resizeCanvas = () => {
-      const containerWidth = canvas.parentElement.clientWidth;
-      const containerHeight = canvas.parentElement.clientHeight;
+      const parentElement = canvas.parentElement;
+
+      const containerWidth = parentElement ? parentElement.clientWidth : 300; // Default to 300px width
+      const containerHeight = parentElement ? parentElement.clientHeight : 150; // Default to 150px height
 
       canvas.width = containerWidth * scaleFactor;
       canvas.height = containerHeight * scaleFactor;
