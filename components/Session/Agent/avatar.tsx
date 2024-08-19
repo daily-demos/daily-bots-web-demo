@@ -12,7 +12,7 @@ export const Avatar: React.FC = () => {
 
   useVoiceClientEvent(
     VoiceEvent.RemoteAudioLevel,
-    useCallback((volume) => {
+    useCallback((volume: number) => {
       if (!volRef.current) return;
       volRef.current.style.transform = `scale(${Math.max(1, 1 + volume)})`;
     }, [])

@@ -10,7 +10,7 @@ const ModelBadge: React.FC = () => {
 
   useVoiceClientEvent(
     VoiceEvent.ConfigUpdated,
-    useCallback((e) => {
+    useCallback((e: unknown) => {
       setModel("Unknown model");
     }, [])
   );

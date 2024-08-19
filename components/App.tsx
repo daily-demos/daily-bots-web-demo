@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import {
-  ConnectionTimeoutError,
-  TransportAuthBundleError,
-  VoiceError,
-} from "realtime-ai";
+import { ConnectionTimeoutError, VoiceError } from "realtime-ai";
 import {
   useVoiceClient,
   useVoiceClientTransportState,
@@ -72,9 +68,7 @@ export default function App() {
 
       await voiceClient.start();
     } catch (e) {
-      if (e instanceof TransportAuthBundleError) {
-        setError(e.message);
-      } else if (e instanceof ConnectionTimeoutError) {
+      if (e instanceof ConnectionTimeoutError) {
         setError(e.message);
       } else {
         setError((e as VoiceError).message || "Unknown error occured");
