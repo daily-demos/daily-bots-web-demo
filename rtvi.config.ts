@@ -1,6 +1,6 @@
 export const BOT_READY_TIMEOUT = 15 * 1000; // 15 seconds
 
-export const defaultBotProfile = "vision_2024_08";
+export const defaultBotProfile = "voice_2024_08";
 export const defaultMaxDuration = 600;
 
 export const defaultServices = {
@@ -16,7 +16,7 @@ export const defaultConfig = [
   {
     service: "llm",
     options: [
- //     { name: "model", value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo" },
+      { name: "model", value: "claude-3-5-sonnet-20240620" },
       {
         name: "initial_messages",
         value: [

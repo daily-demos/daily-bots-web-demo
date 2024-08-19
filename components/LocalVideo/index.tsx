@@ -1,16 +1,15 @@
 import { useEffect, useRef, useCallback } from "react";
-import { VoiceEvent, LLMFunctionCallData } from "realtime-ai";
-import { useVoiceClientMediaTrack } from "realtime-ai-react";
-import { useVoiceClientEvent } from "realtime-ai-react";
-
-
-
+import { LLMHelper, FunctionCallParams } from "realtime-ai";
+import {
+  useVoiceClientMediaTrack,
+  useVoiceClientEvent,
+  useVoiceClient,
+} from "realtime-ai-react";
 
 export default function LocalVideo() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoTrack = useVoiceClientMediaTrack("video", "local");
-
-
+  const voiceClient = useVoiceClient();
   //
   // ---- LLMFunctionCall event: use to take UI action when our get_image
   //      function is executed on the bot. We don't need to send any
@@ -51,12 +50,21 @@ export default function LocalVideo() {
   //   "serverTS": 1723956970762
   // }
 
-  useVoiceClientEvent(
-    VoiceEvent.LLMFunctionCall,
-    // VoiceEvent.Metrics,
-    useCallback((ev) => {
-      console.log("!!! FUNCTION CALL", ev)
-    }, [])
+  (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
+    async (fn: FunctionCallParams) => {
+      console.log("Function call", fn);
+      if (localVideoTrack) {
+        let imageCapture = new imageCapture(localVideoTrack);
+      }
+      return {
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: "image/jpeg",
+          data: "/9j/4AAQSkZJRg...",
+        },
+      };
+    }
   );
 
   //
@@ -73,8 +81,8 @@ export default function LocalVideo() {
   }, [localVideoTrack]);
 
   return (
-    <div style={{ transform: 'scaleX(-1)' }}>
+    <div style={{ transform: "scaleX(-1)" }}>
       <video ref={localVideoRef} autoPlay />
     </div>
   );
-};
+}
