@@ -82,7 +82,7 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
             onClick={() => save()}
             disabled={!hasUnsavedChanges}
           >
-            Upate
+            Update
           </Button>
           <Button onClick={handleClose}>Close</Button>
         </div>

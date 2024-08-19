@@ -6,8 +6,8 @@ import { useVoiceClientEvent } from "realtime-ai-react";
 
 import TranscriptOverlay from "../TranscriptOverlay";
 
-import Avatar from "./avatar";
 import ModelBadge from "./model";
+import WaveForm from "./waveform";
 
 import styles from "./styles.module.css";
 
@@ -50,7 +50,7 @@ export const Agent: React.FC<{
               <Loader2 size={32} className="animate-spin" />
             </span>
           ) : (
-            <Avatar />
+            <WaveForm />
           )}
         </div>
         <TranscriptOverlay />

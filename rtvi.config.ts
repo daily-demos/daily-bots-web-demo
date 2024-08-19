@@ -64,20 +64,6 @@ export const LLM_MODEL_CHOICES = [
     ],
   },
   {
-    label: "Groq",
-    value: "groq",
-    models: [
-      {
-        label: "Llama 3.1 8B (Preview)",
-        value: "llama-3.1-8b-instant",
-      },
-      {
-        label: "Llama 3.1 70B (Preview)",
-        value: "llama-3.1-70b-versatile",
-      },
-    ],
-  },
-  {
     label: "Open AI",
     value: "openai",
     models: [
