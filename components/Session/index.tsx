@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
 import {
-  TransportState,
-  VoiceEvent,
   FunctionCallParams,
   LLMHelper,
+  TransportState,
+  VoiceEvent,
 } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
