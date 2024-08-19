@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  ConfigOption,
-  VoiceClientConfigOption,
-  VoiceClientServices,
-} from "realtime-ai";
+import { cx } from "class-variance-authority";
+import Image from "next/image";
+import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
 
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { LLM_MODEL_CHOICES, PRESET_CHARACTERS } from "@/rtvi.config";
+import { cn } from "@/utils/tailwind";
 
 type CharacterData = {
   name: string;
@@ -30,6 +29,11 @@ const llmProviders = LLM_MODEL_CHOICES.map((choice) => ({
   value: choice.value,
   models: choice.models,
 }));
+
+const tileCX = cx(
+  "rounded-lg p-4 bg-white border border-primary-200 bg-white select-none ring-ring transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+);
+const tileActiveCX = cx("bg-primary-100 border-primary-300");
 
 export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   onConfigUpdate,
@@ -98,24 +102,30 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
           </Button>
         </div>
       </Field>
+
       <Field label="LLM config:" error={false}>
-        <Select
-          disabled={!["ready", "idle"].includes(state)}
-          onChange={(e) => {
-            setLlmProvider(e.currentTarget.value);
-            setLlmModel(
-              llmProviders.find((p) => p.value === e.currentTarget.value)
-                ?.models[0].value!
-            );
-          }}
-          value={llmProvider}
-        >
+        <div className="flex flex-row gap-3">
           {llmProviders.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
+            <div
+              tabIndex={0}
+              className={cn(tileCX, value === llmProvider && tileActiveCX)}
+              key={value}
+              onClick={() => {
+                setLlmProvider(value);
+                setLlmModel(
+                  llmProviders.find((p) => p.value === value)?.models[0].value!
+                );
+              }}
+            >
+              <Image
+                src={`/logo-${value}.svg`}
+                alt={label}
+                width="200"
+                height="60"
+              />
+            </div>
           ))}
-        </Select>
+        </div>
 
         <Select
           onChange={(e) => setLlmModel(e.currentTarget.value)}
