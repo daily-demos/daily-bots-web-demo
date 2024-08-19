@@ -22,6 +22,7 @@ interface ConfigSelectProps {
     services: VoiceClientServices
   ) => void;
   onModifyPrompt: () => void;
+  inSession?: boolean;
 }
 
 const llmProviders = LLM_MODEL_CHOICES.map((choice) => ({
@@ -39,6 +40,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   onConfigUpdate,
   onModifyPrompt,
   state,
+  inSession = false,
 }) => {
   const [llmProvider, setLlmProvider] = useState<string>(llmProviders[0].value);
   const [llmModel, setLlmModel] = useState<string>(
@@ -85,9 +87,9 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   return (
     <div className="flex flex-col flex-wrap gap-4">
       <Field label="Character preset" error={false}>
-        <div className="w-full flex flex-row gap-2">
+        <div className="w-full flex flex-col md:flex-row gap-2">
           <Select
-            disabled={!["ready", "idle"].includes(state)}
+            disabled={inSession && !["ready", "idle"].includes(state)}
             className="flex-1"
             onChange={(e) => setCharacter(parseInt(e.currentTarget.value))}
           >
@@ -104,29 +106,34 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
       </Field>
 
       <Field label="LLM options" error={false}>
-        <div className="flex flex-row gap-2">
-          {llmProviders.map(({ value, label }) => (
-            <div
-              tabIndex={0}
-              className={cn(tileCX, value === llmProvider && tileActiveCX)}
-              key={value}
-              onClick={() => {
-                setLlmProvider(value);
-                setLlmModel(
-                  llmProviders.find((p) => p.value === value)?.models[0].value!
-                );
-              }}
-            >
-              <Image
-                src={`/logo-${value}.svg`}
-                alt={label}
-                width="200"
-                height="60"
-                className="user-select-none pointer-events-none"
-              />
-            </div>
-          ))}
-        </div>
+        {!inSession && (
+          <div className="flex flex-row gap-2">
+            {llmProviders.map(({ value, label }) => (
+              <div
+                tabIndex={0}
+                className={cn(tileCX, value === llmProvider && tileActiveCX)}
+                key={value}
+                onClick={() => {
+                  if (!["ready", "idle"].includes(state)) return;
+
+                  setLlmProvider(value);
+                  setLlmModel(
+                    llmProviders.find((p) => p.value === value)?.models[0]
+                      .value!
+                  );
+                }}
+              >
+                <Image
+                  src={`/logo-${value}.svg`}
+                  alt={label}
+                  width="200"
+                  height="60"
+                  className="user-select-none pointer-events-none"
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         <Select
           onChange={(e) => setLlmModel(e.currentTarget.value)}

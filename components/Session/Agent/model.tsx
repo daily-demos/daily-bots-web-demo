@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from "react";
-import { useVoiceClient } from "realtime-ai-react";
+import { VoiceEvent } from "realtime-ai";
+import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import styles from "./styles.module.css";
 
@@ -7,7 +8,7 @@ const ModelBadge: React.FC = () => {
   const voiceClient = useVoiceClient();
   const [model, setModel] = React.useState<string | undefined>("Unknown model");
 
-  useEffect(() => {
+  const getModelFromConfig = useCallback(() => {
     voiceClient?.getServiceOptionsFromConfig("llm").options.find((option) => {
       if (option.name === "model") {
         setModel(option.value as string);
@@ -16,6 +17,14 @@ const ModelBadge: React.FC = () => {
       return false;
     });
   }, [voiceClient]);
+
+  useVoiceClientEvent(VoiceEvent.ConfigUpdated, () => {
+    getModelFromConfig();
+  });
+
+  useEffect(() => {
+    getModelFromConfig();
+  }, [getModelFromConfig]);
 
   return <div className={styles.modelBadge}>{model}</div>;
 };

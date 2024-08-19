@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   ConfigOption,
   LLMContextMessage,
+  LLMHelper,
   VoiceClientConfigOption,
   VoiceEvent,
 } from "realtime-ai";
@@ -37,10 +38,15 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
   function save() {
     if (!voiceClient) return;
 
-    voiceClient.setServiceOptionInConfig("llm", {
-      name: "initial_messages",
-      value: prompt,
-    });
+    if (voiceClient.state === "ready") {
+      const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+      llmHelper.setContext({ messages: prompt }, true);
+    } else {
+      voiceClient.setServiceOptionInConfig("llm", {
+        name: "initial_messages",
+        value: prompt,
+      });
+    }
 
     setHasUnsavedChanges(false);
   }
@@ -79,6 +85,7 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
       </Card.CardContent>
       <Card.CardFooter>
         <div className="flex flex-row gap-2">
+          <Button onClick={handleClose}>Close</Button>
           <Button
             variant={hasUnsavedChanges ? "success" : "outline"}
             onClick={() => save()}
@@ -86,7 +93,6 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
           >
             Update
           </Button>
-          <Button onClick={handleClose}>Close</Button>
         </div>
       </Card.CardFooter>
     </Card.Card>

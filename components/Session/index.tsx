@@ -10,12 +10,12 @@ import {
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
+import { Configure } from "../Setup";
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 import Agent from "./Agent";
-import Configuration from "./Configuration";
 import Stats from "./Stats";
 import UserMicBubble from "./UserMicBubble";
 
@@ -116,12 +116,12 @@ export const Session = React.memo(
     return (
       <>
         <dialog ref={modalRef}>
-          <Card.Card className="w-svw max-w-full md:max-w-md">
+          <Card.Card className="w-svw max-w-full md:max-w-md lg:max-w-lg">
             <Card.CardHeader>
               <Card.CardTitle>Configuration</Card.CardTitle>
             </Card.CardHeader>
             <Card.CardContent>
-              <Configuration showAllOptions={true} />
+              <Configure state={state} inSession={true} />
             </Card.CardContent>
             <Card.CardFooter>
               <Button onClick={() => setShowDevices(false)}>Close</Button>

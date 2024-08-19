@@ -1,9 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ConfigOption,
-  VoiceClientConfigOption,
-  VoiceClientServices,
-} from "realtime-ai";
+import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
 import { useVoiceClient } from "realtime-ai-react";
 
 import HelpTip from "../ui/helptip";
@@ -15,13 +11,14 @@ import DeviceSelect from "./DeviceSelect";
 import Prompt from "./Prompt";
 
 interface ConfigureProps {
-  startAudioOff: boolean;
-  handleStartAudioOff: () => void;
   state: string;
+  startAudioOff?: boolean;
+  handleStartAudioOff?: () => void;
+  inSession?: boolean;
 }
 
 export const Configure: React.FC<ConfigureProps> = React.memo(
-  ({ startAudioOff, handleStartAudioOff, state }) => {
+  ({ startAudioOff, handleStartAudioOff, state, inSession = false }) => {
     const voiceClient = useVoiceClient()!;
     const [showPrompt, setshowPrompt] = useState<boolean>(false);
     const modalRef = useRef<HTMLDialogElement>(null);
@@ -40,26 +37,28 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
     }, [showPrompt]);
 
     const updateConfig = useCallback(
-      (
+      async (
         config: VoiceClientConfigOption[],
         services: VoiceClientServices | undefined
       ) => {
         const newConfig: VoiceClientConfigOption[] =
           voiceClient.partialToConfig(config);
 
-        voiceClient.updateConfig(newConfig);
+        await voiceClient.updateConfig(newConfig);
 
-        // We should only update services in ready app state (not when connnected)
-        // This try catch any errors if we accidently end up here
         try {
-          if (services && services.llm !== voiceClient.services.llm) {
+          if (
+            !inSession &&
+            services &&
+            services.llm !== voiceClient.services.llm
+          ) {
             voiceClient.services = { ...voiceClient.services, ...services };
           }
         } catch (e) {
           return;
         }
       },
-      [voiceClient]
+      [voiceClient, inSession]
     );
 
     return (
@@ -74,21 +73,24 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
             state={state}
             onModifyPrompt={() => setshowPrompt(true)}
             onConfigUpdate={updateConfig}
+            inSession={inSession}
           />
         </section>
 
-        <section className="flex flex-col gap-4 border-y border-primary-hairline py-4 mt-4">
-          <div className="flex flex-row justify-between items-center">
-            <Label className="flex flex-row gap-1 items-center">
-              Join with mic muted{" "}
-              <HelpTip text="Start with microphone muted (click to unmute)" />
-            </Label>
-            <Switch
-              checked={startAudioOff}
-              onCheckedChange={handleStartAudioOff}
-            />
-          </div>
-        </section>
+        {!inSession && (
+          <section className="flex flex-col gap-4 border-y border-primary-hairline py-4 mt-4">
+            <div className="flex flex-row justify-between items-center">
+              <Label className="flex flex-row gap-1 items-center">
+                Join with mic muted{" "}
+                <HelpTip text="Start with microphone muted (click to unmute)" />
+              </Label>
+              <Switch
+                checked={startAudioOff}
+                onCheckedChange={handleStartAudioOff}
+              />
+            </div>
+          </section>
+        )}
       </>
     );
   },
