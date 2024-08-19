@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 1.5s;
+  transition: background-color 2s;
   overflow: hidden;
 
   @media (max-width: 768px) {

@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
+import {
+  Participant,
+  PipecatMetrics,
+  TransportState,
+  VoiceEvent,
+} from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -26,9 +31,10 @@ interface SessionProps {
 export const Session = React.memo(
   ({ state, onLeave, startAudioOff = false }: SessionProps) => {
     const voiceClient = useVoiceClient()!;
-    const [hasStarted, setHasStarted] = useState(false);
-    const [showDevices, setShowDevices] = useState(false);
-    const [showStats, setShowStats] = useState(false);
+    const [hasStarted, setHasStarted] = useState<boolean>(false);
+    const [showDevices, setShowDevices] = useState<boolean>(false);
+    const [showStats, setShowStats] = useState<boolean>(false);
+    const [trackReady, setTrackReady] = useState<boolean>(false);
     const [muted, setMuted] = useState(startAudioOff);
     const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -49,6 +55,17 @@ export const Session = React.memo(
         if (hasStarted) return;
         setHasStarted(true);
       }, [hasStarted])
+    );
+
+    useVoiceClientEvent(
+      VoiceEvent.TrackStarted,
+      useCallback(
+        (track: MediaStreamTrack, participant: Participant | undefined) => {
+          if (!participant?.local || track.readyState !== "live") return;
+          setTrackReady(true);
+        },
+        []
+      )
     );
 
     // ---- Effects
@@ -94,6 +111,8 @@ export const Session = React.memo(
       setMuted(!muted);
     }
 
+    const ready: boolean = hasStarted && trackReady;
+
     return (
       <>
         <dialog ref={modalRef}>
@@ -130,7 +149,7 @@ export const Session = React.memo(
             />
           </Card.Card>
           <UserMicBubble
-            active={hasStarted}
+            active={ready}
             muted={muted}
             handleMute={() => toggleMute()}
           />
