@@ -69,7 +69,7 @@ export default function LocalVideo() {
 
   return (
     <div style={{ transform: "scaleX(-1)" }}>
-      <video ref={localVideoRef} autoPlay />
+      <video autoPlay playsInline ref={localVideoRef} />
     </div>
   );
 }
