@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { LLMHelper } from "realtime-ai";
+import { FunctionCallParams, LLMHelper } from "realtime-ai";
 import { DailyVoiceClient } from "realtime-ai-daily";
 import { VoiceClientAudio, VoiceClientProvider } from "realtime-ai-react";
 
@@ -18,6 +18,7 @@ import {
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
+  const [fetchingWeather, setFetchingWeather] = useState(false);
   const voiceClientRef = useRef<DailyVoiceClient | null>(null);
 
   useEffect(() => {
@@ -31,7 +32,30 @@ export default function Home() {
       config: defaultConfig,
       timeout: BOT_READY_TIMEOUT,
     });
-    voiceClient.registerHelper("llm", new LLMHelper({}));
+
+    const llmHelper = new LLMHelper({
+      callbacks: {
+        onLLMFunctionCall: (fn) => {
+          setFetchingWeather(true);
+        },
+      },
+    });
+    voiceClient.registerHelper("llm", llmHelper);
+
+    llmHelper.handleFunctionCall(async (fn: FunctionCallParams) => {
+      const args = fn.arguments as any;
+      if (fn.functionName === "get_weather" && args.location) {
+        const response = await fetch(
+          `/api/weather?location=${encodeURIComponent(args.location)}`
+        );
+        const json = await response.json();
+        setFetchingWeather(false);
+        return json;
+      } else {
+        setFetchingWeather(false);
+        return { error: "couldn't fetch weather" };
+      }
+    });
 
     voiceClientRef.current = voiceClient;
   }, [showSplash]);
@@ -47,7 +71,7 @@ export default function Home() {
           <main>
             <Header />
             <div id="app">
-              <App />
+              <App fetchingWeather={fetchingWeather} />
             </div>
           </main>
           <aside id="tray" />

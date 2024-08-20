@@ -23,7 +23,7 @@ const status_text = {
   connecting: "Connecting...",
 };
 
-export default function App() {
+export default function App({ fetchingWeather }: { fetchingWeather: boolean }) {
   const voiceClient = useVoiceClient()!;
   const transportState = useVoiceClientTransportState();
 
@@ -106,6 +106,7 @@ export default function App() {
   if (appState === "connected") {
     return (
       <Session
+        fetchingWeather={fetchingWeather}
         state={transportState}
         onLeave={() => leave()}
         startAudioOff={startAudioOff}

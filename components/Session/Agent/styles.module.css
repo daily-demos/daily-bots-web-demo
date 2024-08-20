@@ -108,6 +108,7 @@
   }
 }
 
+.functionCalling,
 .loader {
   padding: 12px;
   display: inline-block;
@@ -116,6 +117,10 @@
   border-radius: 99px;
   color: white;
   position: absolute;
+}
+
+.functionCalling {
+  background-color: theme(colors.primary.900);
 }
 
 .modelBadge {

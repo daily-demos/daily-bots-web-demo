@@ -12,8 +12,9 @@ import styles from "./styles.module.css";
 export const Agent: React.FC<{
   isReady: boolean;
   statsAggregator: StatsAggregator;
+  fetchingWeather: boolean;
 }> = memo(
-  ({ isReady, statsAggregator }) => {
+  ({ isReady, statsAggregator, fetchingWeather = false }) => {
     const [hasStarted, setHasStarted] = useState<boolean>(false);
     const [botStatus, setBotStatus] = useState<
       "initializing" | "connected" | "disconnected"
@@ -67,13 +68,20 @@ export const Agent: React.FC<{
               <Loader2 size={32} className="animate-spin" />
             </span>
           ) : (
-            <WaveForm />
+            <>
+              {fetchingWeather && (
+                <span className={styles.functionCalling}>
+                  <Loader2 size={32} className="animate-spin" />
+                </span>
+              )}
+              <WaveForm />
+            </>
           )}
         </div>
       </div>
     );
   },
-  (p, n) => p.isReady === n.isReady
+  (p, n) => p.isReady === n.isReady && p.fetchingWeather === n.fetchingWeather
 );
 Agent.displayName = "Agent";
 

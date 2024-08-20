@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { FunctionCallParams, LLMHelper, PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
+import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -21,194 +21,181 @@ interface SessionProps {
   onLeave: () => void;
   openMic?: boolean;
   startAudioOff?: boolean;
+  fetchingWeather: boolean;
 }
 
-export const Session = React.memo(
-  ({ state, onLeave, startAudioOff = false }: SessionProps) => {
-    const voiceClient = useVoiceClient()!;
-    const [hasStarted, setHasStarted] = useState<boolean>(false);
-    const [showDevices, setShowDevices] = useState<boolean>(false);
-    const [showStats, setShowStats] = useState<boolean>(false);
-    const [muted, setMuted] = useState(startAudioOff);
-    const modalRef = useRef<HTMLDialogElement>(null);
+export const Session = ({
+  state,
+  onLeave,
+  startAudioOff = false,
+  fetchingWeather = false,
+}: SessionProps) => {
+  const voiceClient = useVoiceClient()!;
+  const [hasStarted, setHasStarted] = useState<boolean>(false);
+  const [showDevices, setShowDevices] = useState<boolean>(false);
+  const [showStats, setShowStats] = useState<boolean>(false);
+  const [muted, setMuted] = useState(startAudioOff);
+  const modalRef = useRef<HTMLDialogElement>(null);
 
-    // ---- Voice Client Events
+  // ---- Voice Client Events
 
-    useVoiceClientEvent(
-      VoiceEvent.Metrics,
-      useCallback((metrics: PipecatMetrics) => {
-        metrics?.ttfb?.map((m: { processor: string; value: number }) => {
-          stats_aggregator.addStat([m.processor, "ttfb", m.value, Date.now()]);
-        });
-      }, [])
-    );
+  useVoiceClientEvent(
+    VoiceEvent.Metrics,
+    useCallback((metrics: PipecatMetrics) => {
+      metrics?.ttfb?.map((m: { processor: string; value: number }) => {
+        stats_aggregator.addStat([m.processor, "ttfb", m.value, Date.now()]);
+      });
+    }, [])
+  );
 
-    useVoiceClientEvent(
-      VoiceEvent.BotStoppedSpeaking,
-      useCallback(() => {
-        if (hasStarted) return;
-        setHasStarted(true);
-      }, [hasStarted])
-    );
+  useVoiceClientEvent(
+    VoiceEvent.BotStoppedSpeaking,
+    useCallback(() => {
+      if (hasStarted) return;
+      setHasStarted(true);
+    }, [hasStarted])
+  );
 
-    (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
-      async (fn: FunctionCallParams) => {
-        console.log({ fn });
-        const args = fn.arguments as any;
-        if (fn.functionName === "get_weather" && args.location) {
-          const response = await fetch(
-            `/api/weather?location=${encodeURIComponent(args.location)}`
-          );
-          const json = await response.json();
-          console.log("weather:", json);
-          return json;
-        } else {
-          return { error: "couldn't fetch weather" };
-        }
-      }
-    );
+  // ---- Effects
 
-    // ---- Effects
+  useEffect(() => {
+    // Reset started state on mount
+    setHasStarted(false);
+  }, []);
 
-    useEffect(() => {
-      // Reset started state on mount
-      setHasStarted(false);
-    }, []);
+  useEffect(() => {
+    // If we joined unmuted, enable the mic once in ready state
+    if (!hasStarted || startAudioOff) return;
+    voiceClient.enableMic(true);
+  }, [voiceClient, startAudioOff, hasStarted]);
 
-    useEffect(() => {
-      // If we joined unmuted, enable the mic once in ready state
-      if (!hasStarted || startAudioOff) return;
-      voiceClient.enableMic(true);
-    }, [voiceClient, startAudioOff, hasStarted]);
+  useEffect(() => {
+    // Create new stats aggregator on mount (removes stats from previous session)
+    stats_aggregator = new StatsAggregator();
+  }, []);
 
-    useEffect(() => {
-      // Create new stats aggregator on mount (removes stats from previous session)
-      stats_aggregator = new StatsAggregator();
-    }, []);
-
-    useEffect(() => {
-      // Leave the meeting if there is an error
-      if (state === "error") {
-        onLeave();
-      }
-    }, [state, onLeave]);
-
-    useEffect(() => {
-      // Modal effect
-      // Note: backdrop doesn't currently work with dialog open, so we use setModal instead
-      const current = modalRef.current;
-
-      if (current && showDevices) {
-        current.inert = true;
-        current.showModal();
-        current.inert = false;
-      }
-      return () => current?.close();
-    }, [showDevices]);
-
-    function toggleMute() {
-      voiceClient.enableMic(muted);
-      setMuted(!muted);
+  useEffect(() => {
+    // Leave the meeting if there is an error
+    if (state === "error") {
+      onLeave();
     }
+  }, [state, onLeave]);
 
-    return (
-      <>
-        <dialog ref={modalRef}>
-          <Card.Card className="w-svw max-w-full md:max-w-md lg:max-w-lg">
-            <Card.CardHeader>
-              <Card.CardTitle>Configuration</Card.CardTitle>
-            </Card.CardHeader>
-            <Card.CardContent>
-              <Configure state={state} inSession={true} />
-            </Card.CardContent>
-            <Card.CardFooter>
-              <Button onClick={() => setShowDevices(false)}>Close</Button>
-            </Card.CardFooter>
-          </Card.Card>
-        </dialog>
+  useEffect(() => {
+    // Modal effect
+    // Note: backdrop doesn't currently work with dialog open, so we use setModal instead
+    const current = modalRef.current;
 
-        {showStats &&
-          createPortal(
-            <Stats
-              statsAggregator={stats_aggregator}
-              handleClose={() => setShowStats(false)}
-            />,
-            document.getElementById("tray")!
-          )}
+    if (current && showDevices) {
+      current.inert = true;
+      current.showModal();
+      current.inert = false;
+    }
+    return () => current?.close();
+  }, [showDevices]);
 
-        <div className="flex-1 flex flex-col items-center justify-center w-full">
-          <Card.Card
-            fullWidthMobile={false}
-            className="w-full max-w-[320px] sm:max-w-[420px] mt-auto shadow-long"
-          >
-            <Agent
-              isReady={state === "ready"}
-              statsAggregator={stats_aggregator}
-            />
-          </Card.Card>
-          <UserMicBubble
-            active={hasStarted}
-            muted={muted}
-            handleMute={() => toggleMute()}
+  function toggleMute() {
+    voiceClient.enableMic(muted);
+    setMuted(!muted);
+  }
+
+  return (
+    <>
+      <dialog ref={modalRef}>
+        <Card.Card className="w-svw max-w-full md:max-w-md lg:max-w-lg">
+          <Card.CardHeader>
+            <Card.CardTitle>Configuration</Card.CardTitle>
+          </Card.CardHeader>
+          <Card.CardContent>
+            <Configure state={state} inSession={true} />
+          </Card.CardContent>
+          <Card.CardFooter>
+            <Button onClick={() => setShowDevices(false)}>Close</Button>
+          </Card.CardFooter>
+        </Card.Card>
+      </dialog>
+
+      {showStats &&
+        createPortal(
+          <Stats
+            statsAggregator={stats_aggregator}
+            handleClose={() => setShowStats(false)}
+          />,
+          document.getElementById("tray")!
+        )}
+
+      <div className="flex-1 flex flex-col items-center justify-center w-full">
+        <Card.Card
+          fullWidthMobile={false}
+          className="w-full max-w-[320px] sm:max-w-[420px] mt-auto shadow-long"
+        >
+          <Agent
+            isReady={state === "ready"}
+            fetchingWeather={fetchingWeather}
+            statsAggregator={stats_aggregator}
           />
+        </Card.Card>
+        <UserMicBubble
+          active={hasStarted}
+          muted={muted}
+          handleMute={() => toggleMute()}
+        />
+      </div>
+
+      <footer className="w-full flex flex-row mt-auto self-end md:w-auto">
+        <div className="flex flex-row justify-between gap-3 w-full md:w-auto">
+          <Tooltip>
+            <TooltipContent>Interrupt bot</TooltipContent>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  voiceClient.action({
+                    service: "tts",
+                    action: "interrupt",
+                    arguments: [],
+                  });
+                }}
+              >
+                <StopCircle />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipContent>Show bot statistics panel</TooltipContent>
+            <TooltipTrigger asChild>
+              <Button
+                variant={showStats ? "light" : "ghost"}
+                size="icon"
+                onClick={() => setShowStats(!showStats)}
+              >
+                <LineChart />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+          <Tooltip>
+            <TooltipContent>Configure</TooltipContent>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowDevices(true)}
+              >
+                <Settings />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+          <Button onClick={() => onLeave()} className="ml-auto">
+            <LogOut size={16} />
+            End
+          </Button>
         </div>
-
-        <footer className="w-full flex flex-row mt-auto self-end md:w-auto">
-          <div className="flex flex-row justify-between gap-3 w-full md:w-auto">
-            <Tooltip>
-              <TooltipContent>Interrupt bot</TooltipContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    voiceClient.action({
-                      service: "tts",
-                      action: "interrupt",
-                      arguments: [],
-                    });
-                  }}
-                >
-                  <StopCircle />
-                </Button>
-              </TooltipTrigger>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipContent>Show bot statistics panel</TooltipContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showStats ? "light" : "ghost"}
-                  size="icon"
-                  onClick={() => setShowStats(!showStats)}
-                >
-                  <LineChart />
-                </Button>
-              </TooltipTrigger>
-            </Tooltip>
-            <Tooltip>
-              <TooltipContent>Configure</TooltipContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowDevices(true)}
-                >
-                  <Settings />
-                </Button>
-              </TooltipTrigger>
-            </Tooltip>
-            <Button onClick={() => onLeave()} className="ml-auto">
-              <LogOut size={16} />
-              End
-            </Button>
-          </div>
-        </footer>
-      </>
-    );
-  },
-  (p, n) => p.state === n.state
-);
+      </footer>
+    </>
+  );
+};
 
 Session.displayName = "Session";
 
