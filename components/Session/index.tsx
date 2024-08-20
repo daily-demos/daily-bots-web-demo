@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
 import {
-  TransportState,
-  VoiceEvent,
   FunctionCallParams,
   LLMHelper,
+  PipecatMetrics,
+  TransportState,
+  VoiceEvent,
 } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
@@ -52,7 +53,7 @@ export const Session = React.memo(
 
     useVoiceClientEvent(
       VoiceEvent.Metrics,
-      useCallback((metrics) => {
+      useCallback((metrics: PipecatMetrics) => {
         metrics?.ttfb?.map((m: { processor: string; value: number }) => {
           stats_aggregator.addStat([m.processor, "ttfb", m.value, Date.now()]);
         });
@@ -70,11 +71,10 @@ export const Session = React.memo(
     (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
       async (fn: FunctionCallParams) => {
         console.log({ fn });
-        if (fn.functionName === "get_weather" && fn.arguments?.location) {
+        const args = fn.arguments as any;
+        if (fn.functionName === "get_weather" && args.location) {
           const response = await fetch(
-            `/api/weather?location=${encodeURIComponent(
-              fn.arguments?.location
-            )}`
+            `/api/weather?location=${encodeURIComponent(args.location)}`
           );
           const json = await response.json();
           console.log("weather:", json);

@@ -22,7 +22,7 @@ const TranscriptOverlay: React.FC = () => {
 
   useVoiceClientEvent(
     VoiceEvent.BotTranscript,
-    useCallback((transcript) => {
+    useCallback((transcript: string) => {
       setSentences((s) => [...s, transcript]);
     }, [])
   );
