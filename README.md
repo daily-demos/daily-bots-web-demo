@@ -9,6 +9,9 @@
 
 Example NextJS app that demonstrates core capabilities of [Daily Bots](https://bots.daily.co). 
 
+## Other demos
+
+- [Vision](https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch) - Anthropic, describe webcam.
 
 ## Getting started
 
