@@ -57,11 +57,9 @@ All Voice Client configuration can be found in the [rtvi.config.ts](/rtvi.config
 
 ### API routes
 
-This project exposes three server-side routes:
+This project exposes one server-side route:
 
 - [api/route.ts](app/api/route.ts)
-- optional: [api/dialin/route.ts](app/api/dialin/route.ts)
-- optional: [api/dialout/route.ts](app/api/dialout/route.ts)
 
 The routes project a secure way to pass any required secrets or configuration directly to the Daily Bots API. Your `NEXT_PUBLIC_BASE_URL` must point to your `/api` route and passed to the `VoiceClient`. 
 
