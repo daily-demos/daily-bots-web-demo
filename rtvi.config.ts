@@ -52,6 +52,7 @@ export const llmModels: LLMModel[] = [
 ];
 
 export const defaultBotProfile = "voice_2024_08";
+export const defaultMaxDuration = 600;
 
 export const defaultServices = {
   llm: "anthropic",

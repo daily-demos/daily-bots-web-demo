@@ -1,10 +1,9 @@
-// localhost/api [POST]
-
-import { defaultBotProfile } from "./../../rtvi.config";
+// [POST] /api
+import { defaultBotProfile, defaultMaxDuration } from "./../../rtvi.config";
 
 export async function POST(request: Request) {
   const { services, config } = await request.json();
-  console.log({ services, config });
+
   if (!services || !config || !process.env.DAILY_BOTS_URL) {
     return new Response(`Services or config not found on request body`, {
       status: 400,
@@ -13,12 +12,8 @@ export async function POST(request: Request) {
 
   const payload = {
     bot_profile: defaultBotProfile,
-    max_duration: 600,
+    max_duration: defaultMaxDuration,
     services,
-    api_keys: {
-      together: process.env.TOGETHER_API_KEY,
-      cartesia: process.env.CARTESIA_API_KEY,
-    },
     config: [...config],
   };
 
@@ -32,6 +27,10 @@ export async function POST(request: Request) {
   });
 
   const res = await req.json();
+
+  if (req.status !== 200) {
+    return Response.json(res, { status: req.status });
+  }
 
   return Response.json(res);
 }
