@@ -16,10 +16,10 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
         </h1>
 
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-        Function calling with Claude 3.5 Sonnet
+          Function calling with Claude 3.5 Sonnet
         </p>
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-        “ Ask me about the weather ”
+          “ Ask me about the weather ”
         </p>
 
         <Button onClick={() => handleReady()}>Try Demo</Button>
@@ -39,7 +39,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
           <Button variant="light" asChild>
             <a
-              href="https://github.com/daily-demos/daily-bots-web-demo"
+              href="https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-calling"
               className="text-indigo-600"
             >
               <Book className="size-6" />
