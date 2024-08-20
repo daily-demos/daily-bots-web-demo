@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
+import React, { useEffect, useRef, useState } from "react";
 import { useVoiceClient } from "realtime-ai-react";
 
 import HelpTip from "../ui/helptip";
