@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { Mic } from "lucide-react";
 import { useVoiceClientMediaDevices } from "realtime-ai-react";
 
-import { AudioIndicatorBar } from "../AudioIndicator";
 import { Field } from "../ui/field";
 import { Select } from "../ui/select";
+
+import { AudioIndicatorBar } from "./AudioIndicator";
 
 interface DeviceSelectProps {
   hideMeter: boolean;
@@ -22,7 +23,7 @@ export const DeviceSelect: React.FC<DeviceSelectProps> = ({
 
   return (
     <div className="flex flex-col flex-wrap gap-4">
-      <Field label="Microphone:" error={false}>
+      <Field label="Microphone" error={false}>
         <Select
           onChange={(e) => updateMic(e.currentTarget.value)}
           value={selectedMic?.deviceId}

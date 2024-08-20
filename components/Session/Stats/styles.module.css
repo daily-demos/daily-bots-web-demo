@@ -37,6 +37,7 @@
     overflow-x: visible;
     overflow-y: scroll;
     flex-flow: column wrap;
+    padding-bottom: 100px;
   }
 }
 
@@ -110,12 +111,24 @@
 .sectionServices {
   display: flex;
   flex-flow: row;
-  gap: theme(spacing.3);
+  gap: theme(spacing.6);
 
   @screen md {
     display: flex;
     flex-flow: column wrap;
-    gap: theme(spacing.3);
+    gap: theme(spacing.6);
+  }
+}
+
+.serviceTiles {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: theme(spacing.2);
+
+  @screen md {
+    display: flex;
+    flex-flow: column wrap;
+    gap: theme(spacing.6);
   }
 }
 

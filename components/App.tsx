@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import { ConnectionTimeoutError, VoiceError } from "realtime-ai";
+import { VoiceError, VoiceEvent, VoiceMessage } from "realtime-ai";
 import {
   useVoiceClient,
+  useVoiceClientEvent,
   useVoiceClientTransportState,
 } from "realtime-ai-react";
 
@@ -25,11 +26,21 @@ const status_text = {
 export default function App() {
   const voiceClient = useVoiceClient()!;
   const transportState = useVoiceClientTransportState();
+
   const [appState, setAppState] = useState<
-    "idle" | "connecting" | "connected" | "ready"
+    "idle" | "ready" | "connecting" | "connected"
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [startAudioOff, setStartAudioOff] = useState<boolean>(false);
+
+  useVoiceClientEvent(
+    VoiceEvent.Error,
+    useCallback((message: VoiceMessage) => {
+      const errorData = message.data as { error: string; fatal: boolean };
+      if (!errorData.fatal) return;
+      setError(errorData.error);
+    }, [])
+  );
 
   useEffect(() => {
     // Initialize local audio devices
@@ -38,8 +49,8 @@ export default function App() {
   }, [appState, voiceClient]);
 
   useEffect(() => {
-    // Update the app state based on the transport state
-    // We only need a subset of states for the different views
+    // Update app state based on voice client transport state.
+    // We only need a subset of states to determine the ui state,
     // so this effect helps avoid excess inline conditionals.
     switch (transportState) {
       case "initialized":
@@ -64,15 +75,13 @@ export default function App() {
     // Join the session
     try {
       // Disable the mic until the bot has joined
+      // to avoid interrupting the bot's welcome message
       voiceClient.enableMic(false);
 
       await voiceClient.start();
     } catch (e) {
-      if (e instanceof ConnectionTimeoutError) {
-        setError(e.message);
-      } else {
-        setError((e as VoiceError).message || "Unknown error occured");
-      }
+      setError((e as VoiceError).message || "Unknown error occured");
+      voiceClient.disconnect();
     }
   }
 
@@ -80,6 +89,11 @@ export default function App() {
     await voiceClient.disconnect();
   }
 
+  /**
+   * UI States
+   */
+
+  // Error: show full screen message
   if (error) {
     return (
       <Alert intent="danger" title="An error occurred">
@@ -88,6 +102,7 @@ export default function App() {
     );
   }
 
+  // Connected: show session view
   if (appState === "connected") {
     return (
       <Session
@@ -98,15 +113,13 @@ export default function App() {
     );
   }
 
+  // Default: show setup view
   const isReady = appState === "ready";
 
   return (
     <Card.Card shadow className="animate-appear max-w-lg mb-14">
       <Card.CardHeader>
         <Card.CardTitle>Configuration</Card.CardTitle>
-        <Card.CardDescription>
-          Please configure your devices and pipeline settings below
-        </Card.CardDescription>
       </Card.CardHeader>
       <Card.CardContent stack>
         <div className="flex flex-row gap-2 bg-primary-50 px-4 py-2 md:p-2 text-sm items-center justify-center rounded-md font-medium text-pretty">
@@ -116,6 +129,7 @@ export default function App() {
         <Configure
           startAudioOff={startAudioOff}
           handleStartAudioOff={() => setStartAudioOff(!startAudioOff)}
+          state={appState}
         />
       </Card.CardContent>
       <Card.CardFooter>

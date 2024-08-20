@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     max_duration: defaultMaxDuration,
     services,
     config: [...config],
-  };
+  }; 
 
   const req = await fetch(process.env.DAILY_BOTS_URL, {
     method: "POST",

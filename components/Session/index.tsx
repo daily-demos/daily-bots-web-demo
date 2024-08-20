@@ -1,24 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import {
-  FunctionCallParams,
-  LLMHelper,
-  PipecatMetrics,
-  TransportState,
-  VoiceEvent,
-} from "realtime-ai";
+import { FunctionCallParams, LLMHelper, PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
-import Configuration from "../Configuration";
-import Stats from "../Stats";
+import { Configure } from "../Setup";
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import UserMicBubble from "../UserMicBubble";
 
 import Agent from "./Agent";
+import Stats from "./Stats";
+import UserMicBubble from "./UserMicBubble";
 
 let stats_aggregator: StatsAggregator;
 
@@ -32,24 +26,13 @@ interface SessionProps {
 export const Session = React.memo(
   ({ state, onLeave, startAudioOff = false }: SessionProps) => {
     const voiceClient = useVoiceClient()!;
-    const [hasStarted, setHasStarted] = useState(false);
-    const [showDevices, setShowDevices] = useState(false);
-    const [showStats, setShowStats] = useState(false);
+    const [hasStarted, setHasStarted] = useState<boolean>(false);
+    const [showDevices, setShowDevices] = useState<boolean>(false);
+    const [showStats, setShowStats] = useState<boolean>(false);
     const [muted, setMuted] = useState(startAudioOff);
     const modalRef = useRef<HTMLDialogElement>(null);
 
     // ---- Voice Client Events
-
-    // Wait for the bot to enter a ready state and trigger it to say hello
-    /*useVoiceClientEvent(
-      VoiceEvent.BotReady,
-      useCallback(() => {
-        voiceClient.appendLLMContext({
-          role: "assistant",
-          content: "Greet the user",
-        });
-      }, [voiceClient])
-    );*/
 
     useVoiceClientEvent(
       VoiceEvent.Metrics,
@@ -131,12 +114,12 @@ export const Session = React.memo(
     return (
       <>
         <dialog ref={modalRef}>
-          <Card.Card className="w-svw max-w-full md:max-w-md">
+          <Card.Card className="w-svw max-w-full md:max-w-md lg:max-w-lg">
             <Card.CardHeader>
               <Card.CardTitle>Configuration</Card.CardTitle>
             </Card.CardHeader>
             <Card.CardContent>
-              <Configuration showAllOptions={true} />
+              <Configure state={state} inSession={true} />
             </Card.CardContent>
             <Card.CardFooter>
               <Button onClick={() => setShowDevices(false)}>Close</Button>
@@ -178,7 +161,13 @@ export const Session = React.memo(
                 <Button
                   variant="ghost"
                   size="icon"
-                  //onClick={() => voiceClient.interrupt()}
+                  onClick={() => {
+                    voiceClient.action({
+                      service: "tts",
+                      action: "interrupt",
+                      arguments: [],
+                    });
+                  }}
                 >
                   <StopCircle />
                 </Button>

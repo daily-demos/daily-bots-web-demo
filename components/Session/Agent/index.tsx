@@ -4,8 +4,8 @@ import { Loader2 } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
 import { useVoiceClientEvent } from "realtime-ai-react";
 
-import Avatar from "./avatar";
 import ModelBadge from "./model";
+import WaveForm from "./waveform";
 
 import styles from "./styles.module.css";
 
@@ -18,6 +18,7 @@ export const Agent: React.FC<{
     const [botStatus, setBotStatus] = useState<
       "initializing" | "connected" | "disconnected"
     >("initializing");
+    const [botIsTalking, setBotIsTalking] = useState<boolean>(false);
 
     useEffect(() => {
       // Update the started state when the transport enters the ready state
@@ -34,10 +35,28 @@ export const Agent: React.FC<{
       }, [])
     );
 
+    useVoiceClientEvent(
+      VoiceEvent.BotStartedSpeaking,
+      useCallback(() => {
+        setBotIsTalking(true);
+      }, [])
+    );
+
+    useVoiceClientEvent(
+      VoiceEvent.BotStoppedSpeaking,
+      useCallback(() => {
+        setBotIsTalking(false);
+      }, [])
+    );
+
     // Cleanup
     useEffect(() => () => setHasStarted(false), []);
 
-    const cx = clsx(styles.agentWindow, hasStarted && styles.ready);
+    const cx = clsx(
+      styles.agentWindow,
+      hasStarted && styles.ready,
+      botIsTalking && styles.talking
+    );
 
     return (
       <div className={styles.agent}>
@@ -48,7 +67,7 @@ export const Agent: React.FC<{
               <Loader2 size={32} className="animate-spin" />
             </span>
           ) : (
-            <Avatar />
+            <WaveForm />
           )}
         </div>
       </div>

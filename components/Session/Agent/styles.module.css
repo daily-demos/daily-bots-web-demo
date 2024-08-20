@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 2.5s;
+  transition: background-color 2s;
   overflow: hidden;
 
   @media (max-width: 768px) {
@@ -20,8 +20,12 @@
   }
 }
 
-.connected {
-  background: theme(colors.primary.600);
+.ready {
+  background: theme(colors.gray.600);
+}
+
+.talking {
+  background-color: theme(colors.primary.950);
 }
 
 .agentFooter {
