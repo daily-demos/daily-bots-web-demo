@@ -40,12 +40,12 @@ export const LLM_MODEL_CHOICES = [
     value: "together",
     models: [
       {
-        label: "Meta Llama 3.1 8B Instruct Turbo",
-        value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-      },
-      {
         label: "Meta Llama 3.1 70B Instruct Turbo",
         value: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+      },
+      {
+        label: "Meta Llama 3.1 8B Instruct Turbo",
+        value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
       },
       {
         label: "Meta Llama 3.1 405B Instruct Turbo",
@@ -68,12 +68,12 @@ export const LLM_MODEL_CHOICES = [
     value: "openai",
     models: [
       {
-        label: "GPT-4o Mini",
-        value: "gpt-4o-mini",
-      },
-      {
         label: "GPT-4o",
         value: "gpt-4o",
+      },
+      {
+        label: "GPT-4o Mini",
+        value: "gpt-4o-mini",
       },
     ],
   },
