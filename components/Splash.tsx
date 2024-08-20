@@ -26,7 +26,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           <span className="text-primary-500" style={{ fontSize: '50%', lineHeight: '10%' }}>
           Function calling with <br />
           Claude 3.5 Sonnet <br />
-          "Ask me about the weather"
+          &ldquo; Ask me about the weather &rdquo;
           </span>
         </h1>
 
