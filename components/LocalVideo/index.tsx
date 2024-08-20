@@ -49,7 +49,7 @@ export default function LocalVideo() {
   (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
     async (fn: FunctionCallParams) => {
       console.log("Function call", fn);
-      var audio = new Audio("shutter.mp3");
+      const audio = new Audio("shutter.mp3");
       audio.play();
     }
   );

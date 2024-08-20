@@ -15,8 +15,7 @@ export async function POST(request: Request) {
     max_duration: defaultMaxDuration,
     services,
     api_keys: {
-      together: process.env.TOGETHER_API_KEY,
-      cartesia: process.env.CARTESIA_API_KEY,
+      openai: process.env.OPENAI_API_KEY,
     },
     config: [...config],
   };

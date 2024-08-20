@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Mic } from "lucide-react";
+import { Mic, Webcam } from "lucide-react";
 import { useVoiceClientMediaDevices } from "realtime-ai-react";
 
 import { Field } from "../ui/field";
@@ -14,16 +14,23 @@ interface DeviceSelectProps {
 export const DeviceSelect: React.FC<DeviceSelectProps> = ({
   hideMeter = false,
 }) => {
-  const { availableMics, selectedMic, updateMic } =
-    useVoiceClientMediaDevices();
+  const {
+    availableMics,
+    selectedMic,
+    updateMic,
+    availableCams,
+    selectedCam,
+    updateCam,
+  } = useVoiceClientMediaDevices();
 
   useEffect(() => {
     updateMic(selectedMic?.deviceId);
-  }, [updateMic, selectedMic]);
+    updateCam(selectedCam?.deviceId);
+  }, [updateMic, selectedMic, updateCam, selectedCam]);
 
   return (
     <div className="flex flex-col flex-wrap gap-4">
-      <Field label="Microphone:" error={false}>
+      <Field label="Microphone" error={false}>
         <Select
           onChange={(e) => updateMic(e.currentTarget.value)}
           value={selectedMic?.deviceId}
@@ -42,25 +49,23 @@ export const DeviceSelect: React.FC<DeviceSelectProps> = ({
         {!hideMeter && <AudioIndicatorBar />}
       </Field>
 
-      {/*}
-      <Field label="Speakers:">
+      <Field label="Camera" error={false}>
         <Select
-          icon={<Speaker size={24} />}
-          onChange={(e) => handleSpeakerChange(e.target.value)}
-          defaultValue={currentSpeaker?.device.deviceId}
+          onChange={(e) => updateCam(e.currentTarget.value)}
+          value={selectedCam?.deviceId}
+          icon={<Webcam size={24} />}
         >
-          {speakers.length === 0 ? (
-            <option value="default">Use system default</option>
+          {availableCams.length === 0 ? (
+            <option value="">Loading devices...</option>
           ) : (
-            speakers.map((m) => (
-              <option key={m.device.deviceId} value={m.device.deviceId}>
-                {m.device.label}
+            availableCams.map((cam) => (
+              <option key={cam.deviceId} value={cam.deviceId}>
+                {cam.label}
               </option>
             ))
           )}
         </Select>
       </Field>
-      */}
     </div>
   );
 };

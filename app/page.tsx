@@ -7,6 +7,7 @@ import { DailyVoiceClient } from "realtime-ai-daily";
 import { VoiceClientAudio, VoiceClientProvider } from "realtime-ai-react";
 
 import App from "@/components/App";
+import { CharacterProvider } from "@/components/context";
 import Header from "@/components/Header";
 import Splash from "@/components/Splash";
 import {
@@ -23,7 +24,6 @@ export default function Home() {
     if (!showSplash || voiceClientRef.current) {
       return;
     }
-
     const voiceClient = new DailyVoiceClient({
       baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "/api",
       services: defaultServices,
@@ -31,13 +31,8 @@ export default function Home() {
       timeout: BOT_READY_TIMEOUT,
       enableCam: true,
     });
-
-    voiceClient.registerHelper(
-      "llm",
-      new LLMHelper({
-        callbacks: {},
-      })
-    ) as LLMHelper;
+    const llmHelper = new LLMHelper({});
+    voiceClient.registerHelper("llm", llmHelper);
 
     voiceClientRef.current = voiceClient;
   }, [showSplash]);
@@ -48,15 +43,17 @@ export default function Home() {
 
   return (
     <VoiceClientProvider voiceClient={voiceClientRef.current!}>
-      <TooltipProvider>
-        <main>
-          <Header />
-          <div id="app">
-            <App />
-          </div>
-        </main>
-        <aside id="tray" />
-      </TooltipProvider>
+      <CharacterProvider>
+        <TooltipProvider>
+          <main>
+            <Header />
+            <div id="app">
+              <App />
+            </div>
+          </main>
+          <aside id="tray" />
+        </TooltipProvider>
+      </CharacterProvider>
       <VoiceClientAudio />
     </VoiceClientProvider>
   );

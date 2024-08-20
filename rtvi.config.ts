@@ -1,4 +1,4 @@
-export const BOT_READY_TIMEOUT = 15 * 1000; // 15 seconds
+export const BOT_READY_TIMEOUT = 30 * 1000; // 30 seconds
 
 export const defaultBotProfile = "vision_2024_08";
 export const defaultMaxDuration = 600;
@@ -44,4 +44,8 @@ Be brief and to the point when you tell the user you will check the video stream
       { name: "run_on_config", value: true },
     ],
   },
+];
+
+export const TTS_VOICES = [
+  { name: "Britsh Lady", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
 ];

@@ -3,6 +3,7 @@
 import {
   defaultBotProfile,
   defaultConfig,
+  defaultMaxDuration,
   defaultServices,
 } from "./../../../rtvi.config";
 
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
   const payload = {
     bot_profile: defaultBotProfile,
     services: defaultServices,
+    max_duration: defaultMaxDuration,
     api_keys: {
       together: process.env.TOGETHER_API_KEY,
       cartesia: process.env.CARTESIA_API_KEY,

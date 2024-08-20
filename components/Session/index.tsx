@@ -5,13 +5,12 @@ import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
-import LocalVideo from "../LocalVideo";
+import { Configure } from "../Setup";
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 import Agent from "./Agent";
-import Configuration from "./Configuration";
 import Stats from "./Stats";
 import UserMicBubble from "./UserMicBubble";
 
@@ -27,9 +26,9 @@ interface SessionProps {
 export const Session = React.memo(
   ({ state, onLeave, startAudioOff = false }: SessionProps) => {
     const voiceClient = useVoiceClient()!;
-    const [hasStarted, setHasStarted] = useState(false);
-    const [showDevices, setShowDevices] = useState(false);
-    const [showStats, setShowStats] = useState(false);
+    const [hasStarted, setHasStarted] = useState<boolean>(false);
+    const [showDevices, setShowDevices] = useState<boolean>(false);
+    const [showStats, setShowStats] = useState<boolean>(false);
     const [muted, setMuted] = useState(startAudioOff);
     const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -98,12 +97,12 @@ export const Session = React.memo(
     return (
       <>
         <dialog ref={modalRef}>
-          <Card.Card className="w-svw max-w-full md:max-w-md">
+          <Card.Card className="w-svw max-w-full md:max-w-md lg:max-w-lg">
             <Card.CardHeader>
               <Card.CardTitle>Configuration</Card.CardTitle>
             </Card.CardHeader>
             <Card.CardContent>
-              <Configuration showAllOptions={true} />
+              <Configure state={state} inSession={true} />
             </Card.CardContent>
             <Card.CardFooter>
               <Button onClick={() => setShowDevices(false)}>Close</Button>
@@ -125,8 +124,6 @@ export const Session = React.memo(
             fullWidthMobile={false}
             className="w-full max-w-[320px] sm:max-w-[420px] mt-auto shadow-long"
           >
-            <LocalVideo />
-
             <Agent
               isReady={state === "ready"}
               statsAggregator={stats_aggregator}

@@ -1,27 +1,41 @@
 .agent {
-  padding: theme(spacing.2);
   position: relative;
+  overflow: hidden;
 }
 
 .agentWindow {
   min-width: 400px;
   aspect-ratio: 1;
-  background: theme(colors.primary.300);
+
   border-radius: theme(borderRadius.2xl);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 2.5s;
+  transition: background-color 2s;
   overflow: hidden;
+  z-index: 1;
 
   @media (max-width: 768px) {
     min-width: 0;
   }
 }
 
-.connected {
-  background: theme(colors.primary.600);
+.video {
+  position: absolute;
+  object-fit: cover !important;
+  z-index: 0;
+  border-radius: theme(borderRadius.3xl);
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.ready {
+}
+
+.talking {
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .agentFooter {

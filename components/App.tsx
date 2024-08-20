@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import { VoiceError } from "realtime-ai";
+import { VoiceError, VoiceEvent, VoiceMessage } from "realtime-ai";
 import {
   useVoiceClient,
+  useVoiceClientEvent,
   useVoiceClientTransportState,
 } from "realtime-ai-react";
 
@@ -27,10 +28,19 @@ export default function App() {
   const transportState = useVoiceClientTransportState();
 
   const [appState, setAppState] = useState<
-    "idle" | "connecting" | "connected" | "ready"
+    "idle" | "ready" | "connecting" | "connected"
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [startAudioOff, setStartAudioOff] = useState<boolean>(false);
+
+  useVoiceClientEvent(
+    VoiceEvent.Error,
+    useCallback((message: VoiceMessage) => {
+      const errorData = message.data as { error: string; fatal: boolean };
+      if (!errorData.fatal) return;
+      setError(errorData.error);
+    }, [])
+  );
 
   useEffect(() => {
     // Initialize local audio devices
@@ -110,9 +120,6 @@ export default function App() {
     <Card.Card shadow className="animate-appear max-w-lg mb-14">
       <Card.CardHeader>
         <Card.CardTitle>Configuration</Card.CardTitle>
-        <Card.CardDescription>
-          Please configure your devices and pipeline settings below
-        </Card.CardDescription>
       </Card.CardHeader>
       <Card.CardContent stack>
         <div className="flex flex-row gap-2 bg-primary-50 px-4 py-2 md:p-2 text-sm items-center justify-center rounded-md font-medium text-pretty">
@@ -122,6 +129,7 @@ export default function App() {
         <Configure
           startAudioOff={startAudioOff}
           handleStartAudioOff={() => setStartAudioOff(!startAudioOff)}
+          state={appState}
         />
       </Card.CardContent>
       <Card.CardFooter>
