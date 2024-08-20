@@ -1,4 +1,4 @@
-[![Try](https://img.shields.io/badge/try_it-here-blue)](https://demo.dailybots.ai)
+[![Try](https://img.shields.io/badge/try_it-here-blue)](https://vision.dailybots.ai)
 [![Deploy](https://img.shields.io/badge/Deploy_to_Vercel-black?style=flat&logo=Vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdaily-demos%2Fdaily-bots-web-demo&env=DAILY_BOTS_URL,DAILY_API_KEY,NEXT_PUBLIC_BASE_URL&project-name=daily-bots-demo&repository-name=daily-bots-web-demo)
 
 
