@@ -11,6 +11,11 @@ Example NextJS app that demonstrates vision capabilities of [Daily Bots](https:/
 
 Uses `vision_2024_08` [Daily Bot profile](https://docs.dailybots.ai/api-reference/server/bot_profiles#bot-profiles).
 
+## Other demos
+
+- [Multi-model](https://github.com/daily-demos/daily-bots-web-demo/) - Main demo showcase.
+- [Vision](https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch) - Anthropic, describe webcam.
+
 
 ## Getting started
 
