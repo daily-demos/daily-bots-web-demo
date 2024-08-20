@@ -4,7 +4,7 @@ type LogoProps = {
   className?: string;
 };
 
-const Logo: React.FC<LogoProps> = ({ className }) => {
+export const Logo: React.FC<LogoProps> = ({ className }) => {
   return (
     <svg
       width="400"
