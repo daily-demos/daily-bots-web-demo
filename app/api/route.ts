@@ -13,6 +13,7 @@ export async function POST(request: Request) {
 
   const payload = {
     bot_profile: defaultBotProfile,
+    max_duration: 600,
     services,
     api_keys: {
       together: process.env.TOGETHER_API_KEY,
