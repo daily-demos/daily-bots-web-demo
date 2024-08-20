@@ -23,10 +23,13 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
       <div className="flex flex-col gap-8 lg:gap-12 items-center max-w-full lg:max-w-3xl">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-balance text-left">
           Daily Bots demo <br />
-          <span className="text-primary-500" style={{ fontSize: '50%', lineHeight: '10%' }}>
-          Function calling with <br />
-          Claude 3.5 Sonnet <br />
-          "Ask me about the weather"
+          <span
+            className="text-primary-500"
+            style={{ fontSize: "50%", lineHeight: "10%" }}
+          >
+            Function calling with <br />
+            Claude 3.5 Sonnet <br />
+            Ask me about the weather
           </span>
         </h1>
 
@@ -38,7 +41,10 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
         <footer className="flex flex-col lg:gap-2">
           <Button variant="light" asChild>
-            <a href="https://www.daily.co/products/daily-bots/" className="text-indigo-600">
+            <a
+              href="https://www.daily.co/products/daily-bots/"
+              className="text-indigo-600"
+            >
               <Info className="size-6" />
               Learn more about Daily Bots
             </a>
