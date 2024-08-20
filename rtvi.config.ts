@@ -16,7 +16,7 @@ export const defaultConfig = [
   {
     service: "llm",
     options: [
-      { name: "model", value: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo" },
+      { name: "model", value: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
       {
         name: "initial_messages",
         value: [
