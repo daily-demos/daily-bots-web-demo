@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { cx } from "class-variance-authority";
 import Image from "next/image";
 import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
+import { useVoiceClient } from "realtime-ai-react";
 
+import { CharacterContext } from "@/components/context";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
@@ -42,14 +44,35 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   state,
   inSession = false,
 }) => {
-  const [llmProvider, setLlmProvider] = useState<string>(llmProviders[0].value);
-  const [llmModel, setLlmModel] = useState<string>(
-    llmProviders[0].models[0].value
-  );
-  const [character, setCharacter] = useState<number>(0);
+  const voiceClient = useVoiceClient();
+  const [llmProvider, setLlmProvider] = useState<string>();
+  const [llmModel, setLlmModel] = useState<string>();
+  const { character, setCharacter } = useContext(CharacterContext);
 
+  // Assign default values to llm provider and model from client config
   useEffect(() => {
+    if (!voiceClient) return;
+
+    // Get the current llm provider and model
+    setLlmProvider(voiceClient?.services.llm ?? llmProviders[0].value);
+
+    // Get the current llm model
+    voiceClient.getServiceOptionsFromConfig("llm").options.find((option) => {
+      if (option.name === "model") {
+        setLlmModel(
+          (option.value as string) ?? llmProviders[0].models[0].value
+        );
+      }
+    });
+  }, [voiceClient]);
+
+  // Update the config options when the character changes
+  useEffect(() => {
+    if (!llmModel || !llmProvider) return;
+
+    // Get character data and update config
     const characterData = PRESET_CHARACTERS[character] as CharacterData;
+
     const updateConfigOptions: VoiceClientConfigOption[] = [
       {
         service: "tts",
@@ -78,7 +101,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
       },
     ];
     onConfigUpdate(updateConfigOptions, { llm: llmProvider });
-  }, [llmProvider, llmModel, character, onConfigUpdate]);
+  }, [llmProvider, llmModel, onConfigUpdate, character]);
 
   const availableModels = LLM_MODEL_CHOICES.find(
     (choice) => choice.value === llmProvider
@@ -91,6 +114,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
           <Select
             disabled={inSession && !["ready", "idle"].includes(state)}
             className="flex-1"
+            value={character}
             onChange={(e) => setCharacter(parseInt(e.currentTarget.value))}
           >
             {PRESET_CHARACTERS.map(({ name }, i) => (

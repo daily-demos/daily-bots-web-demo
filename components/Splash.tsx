@@ -12,15 +12,16 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
     <main className="w-full flex items-center justify-center bg-primary-200 p-4 bg-[length:auto_50%] lg:bg-auto bg-colorWash bg-no-repeat bg-right-top">
       <div className="flex flex-col gap-8 lg:gap-12 items-center max-w-full lg:max-w-3xl">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-balance text-left">
-          Daily Bots demo <br />
-          <span className="text-primary-500" style={{ fontSize: '50%', lineHeight: '10%' }}>
+          Daily Bots demo
+        </h1>
+
+        <p className="text-primary-500 text-xl font-semibold leading-relaxed">
           Claude 3.5 Sonnet <br />
           Together Llama 3.1 &nbsp; 8B <br />
           Together Llama 3.1 &nbsp; 70B <br />
           Together Llama 3.1 &nbsp; 405B <br />
           GPT-4o mini
-          </span>
-        </h1>
+        </p>
 
         <Button onClick={() => handleReady()}>Try Demo</Button>
 
@@ -28,7 +29,10 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
         <footer className="flex flex-col lg:gap-2">
           <Button variant="light" asChild>
-            <a href="https://www.daily.co/products/daily-bots/" className="text-indigo-600">
+            <a
+              href="https://www.daily.co/products/daily-bots/"
+              className="text-indigo-600"
+            >
               <Info className="size-6" />
               Learn more about Daily Bots
             </a>

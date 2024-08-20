@@ -41,10 +41,15 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
         config: VoiceClientConfigOption[],
         services: VoiceClientServices | undefined
       ) => {
+        console.log("UPDATE CONFIG CALLED");
         const newConfig: VoiceClientConfigOption[] =
           voiceClient.partialToConfig(config);
 
-        await voiceClient.updateConfig(newConfig);
+        if (inSession) {
+          await voiceClient.updateConfig(newConfig);
+        } else {
+          voiceClient.updateConfig(newConfig);
+        }
 
         try {
           if (
