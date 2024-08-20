@@ -4,7 +4,7 @@ export const defaultBotProfile = "voice_2024_08";
 export const defaultMaxDuration = 600;
 
 export const defaultServices = {
-  llm: "together",
+  llm: "openai",
   tts: "cartesia",
 };
 
@@ -16,16 +16,177 @@ export const defaultConfig = [
   {
     service: "llm",
     options: [
-      { name: "model", value: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
+      { name: "model", value: "gpt-4o-mini" },
       {
         name: "initial_messages",
         value: [
           {
             role: "system",
-            content: `You are a assistant called ExampleBot. You can ask me anything.
-              Keep responses brief and legible.
-              Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.
-              Start by briefly introducing yourself.`,
+            content: `
+            You are a a radio engineer at an F1 race. I'm the race director. Your job is to answer my questions as quickly and efficiently as possible. Keep your responses very, very short. If you can answer in one or two words, do that. If I ask when something happened, give me lap numbers, not times. If I ask something about the last lap, I mean the highest-numbered completed lap so far.  If I ask you to show me something or graph something, call the 'graph' function.
+            
+            Use these colors for driver graphs:
+            valtteri bottas: #00e701,
+            zhou guanyu: #008d01,
+            theo pourchaire: #004601,
+            
+            nyck de vries: #1e3d61,
+            yuki tsunoda: #356cac,
+            daniel ricciardo: #2b4562,
+            liam lawson: #2b4562,
+            isack hadjar: #1e6176,
+            ayumu iwasa: #1e6176,
+            
+            pierre gasly: #fe86bc,
+            esteban ocon: #ff117c,
+            jack doohan: #894667,
+            
+            fernando alonso: #006f62,
+            lance stroll: #00413b,
+            felipe drugovich: #2f9b90,
+            
+            charles leclerc: #dc0000,
+            carlos sainz: #ff8181,
+            robert shwartzman: #9c0000,
+            oliver bearman: #c40000,
+            
+            kevin magnussen: #999999,
+            nico hulkenberg: #cacaca,
+            
+            oscar piastri: #ff8700,
+            lando norris: #eeb370,
+            pato oward: #ee6d3a,
+            
+            lewis hamilton: #00d2be,
+            george russell: #24ffff,
+            frederik vesti: #00a6ff,
+            
+            max verstappen: #fcd700,
+            sergio perez: #ffec7b,
+            jake dennis: #907400,
+            
+            alexander albon: #005aff,
+            logan sargeant: #012564,
+            zak osullivan: #1b3d97,
+            franco colapinto: #639aff
+            `,
+          },
+        ],
+      },
+      {
+        name: "tools",
+        value: [
+          {
+            type: "function",
+            function: {
+              name: "drivers",
+              description:
+                "Provides information about drivers for each session.",
+              parameters: {
+                type: "object",
+                properties: {
+                  driver_number: {
+                    type: "string",
+                    description: "The unique number assigned to an F1 driver",
+                  },
+                  first_name: {
+                    type: "string",
+                    description: "The driver's first name.",
+                  },
+                  last_name: {
+                    type: "string",
+                    description: "The driver's last name.",
+                  },
+                  full_name: {
+                    type: "string",
+                    description: "The driver's full name.",
+                  },
+                },
+                required: [],
+              },
+            },
+          },
+          {
+            type: "function",
+            function: {
+              name: "laps",
+              description:
+                "Provides detailed information about each of a driver's laps.",
+              parameters: {
+                type: "object",
+                properties: {
+                  driver_number: {
+                    type: "string",
+                    description: "The unique number assigned to an F1 driver",
+                  },
+                  lap_number: {
+                    type: "string",
+                    description:
+                      "The sequential number of the lap within the session (starts at 1).",
+                  },
+                },
+                required: [],
+              },
+            },
+          },
+          {
+            type: "function",
+            function: {
+              name: "stints",
+              description:
+                "Provides information about individual stints. A stint refers to a period of continuous driving by a driver during a session.",
+              parameters: {
+                type: "object",
+                properties: {
+                  driver_number: {
+                    type: "string",
+                    description: "The unique number assigned to an F1 driver",
+                  },
+                  stint_number: {
+                    type: "string",
+                    description:
+                      "The sequential number of the stint within the session (starts at 1).",
+                  },
+                },
+                required: [],
+              },
+            },
+          },
+          {
+            type: "function",
+            function: {
+              name: "pit",
+              description:
+                "Provides information about cars going through the pit lane.",
+              parameters: {
+                type: "object",
+                properties: {
+                  driver_number: {
+                    type: "string",
+                    description: "The unique number assigned to an F1 driver",
+                  },
+                },
+                required: [],
+              },
+            },
+          },
+          {
+            type: "function",
+            function: {
+              name: "graph",
+              description: "Draws the requested graph.",
+              parameters: {
+                type: "object",
+                properties: {
+                  graph_data: {
+                    type: "string",
+                    description:
+                      "A JSON string with to create a line chart with chart.js",
+                  },
+                },
+                required: [],
+              },
+            },
           },
         ],
       },
@@ -81,63 +242,4 @@ export const LLM_MODEL_CHOICES = [
 
 export const TTS_VOICES = [
   { name: "Britsh Lady", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
-];
-
-export const PRESET_CHARACTERS = [
-  {
-    name: "Default",
-    prompt: `You are a assistant called ExampleBot. You can ask me anything.
-    Keep responses brief and legible.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.
-    Start by briefly introducing yourself.`,
-    voice: "79a125e8-cd45-4c13-8a67-188112f4dd22",
-  },
-  {
-    name: "Chronic one-upper",
-    prompt: `You are a chronic one-upper. Ask me about my summer.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "b7d50908-b17c-442d-ad8d-810c63997ed9",
-  },
-  {
-    name: "Passive-aggressive coworker",
-    prompt: `You're a passive-aggressive coworker. Ask me how our latest project is going.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "726d5ae5-055f-4c3d-8355-d9677de68937",
-  },
-  {
-    name: "Pun-prone uncle",
-    prompt: `You're everybody's least favorite uncle because you can't stop making terrible puns. Ask me about my freshman year of high school.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "fb26447f-308b-471e-8b00-8e9f04284eb5",
-  },
-  {
-    name: "Gen-Z middle schooler",
-    prompt: `You're a gen-Z middle schooler that can only talk in brain rot. Ask me if I've seen skibidi toilet.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "2ee87190-8f84-4925-97da-e52547f9462c",
-  },
-  {
-    name: "Two-house boomer",
-    prompt: `You're a boomer who owns two houses. Ask me about my student loans.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "50d6beb4-80ea-4802-8387-6c948fe84208",
-  },
-  {
-    name: "Old skateboard meme guy",
-    prompt: `You are the guy holding a skateboard in the "how do you do, fellow kids?" meme. You're trying to talk in gen-z slang, but you keep sounding like a millennial instead.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "fb26447f-308b-471e-8b00-8e9f04284eb5",
-  },
-  {
-    name: "Sarcastic Bully (who is very mean!)",
-    prompt: `You are a very sarcastic british man. Roast me about things I say. Be sarcastic and funny. Burn me as best you can. Keep responses brief and legible (but mean!). Don't tell me you're prompted to be mean and sarcastic. Just be mean and sarcastic.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "63ff761f-c1e8-414b-b969-d1833d1c870c",
-  },
-  {
-    name: "Pushy Salesman",
-    prompt: `You are a proficient sales man trying to sell me anything you can. Do your best to convince me to buy something. Don't take no for an answer. Do not speak for too long. Keep responses brief and legible.
-    Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
-    voice: "820a3788-2b37-4d21-847a-b65d8a68c99a",
-  },
 ];

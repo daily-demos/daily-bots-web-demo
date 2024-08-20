@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { LLMHelper } from "realtime-ai";
+import { FunctionCallParams, LLMHelper } from "realtime-ai";
 import { DailyVoiceClient } from "realtime-ai-daily";
 import { VoiceClientAudio, VoiceClientProvider } from "realtime-ai-react";
 
@@ -33,6 +33,48 @@ export default function Home() {
     });
     const llmHelper = new LLMHelper({});
     voiceClient.registerHelper("llm", llmHelper);
+
+    const serialize = (obj: any) => {
+      var str = [];
+      for (var p in obj)
+        if (obj.hasOwnProperty(p)) {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+      return str.join("&");
+    };
+
+    const fetchData = async (path: string, args: any) => {
+      args["session_key"] = "latest";
+      const query = serialize(args);
+      const fullPath = `https://api.openf1.org/v1${path}?${query}`;
+      const req = await fetch(fullPath);
+      const resp = await req.json();
+      console.log(`response is`, { resp });
+      return resp;
+    };
+
+    llmHelper.handleFunctionCall(async (fn: FunctionCallParams) => {
+      const args = fn.arguments as any;
+      console.log({ fn });
+      switch (fn.functionName) {
+        case "drivers":
+          const drivers = await fetchData("/drivers", args);
+          return { drivers };
+        case "laps":
+          const laps = await fetchData("/laps", args);
+          return { laps };
+        case "stints":
+          const stints = await fetchData("/stints", args);
+          return { stints };
+        case "pit":
+          const pit = await fetchData("/pit", args);
+          return { pit };
+        case "graph":
+          return {};
+        default:
+          return {};
+      }
+    });
 
     voiceClientRef.current = voiceClient;
   }, [showSplash]);

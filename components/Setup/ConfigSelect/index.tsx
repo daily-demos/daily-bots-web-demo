@@ -66,112 +66,11 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     });
   }, [voiceClient]);
 
-  // Update the config options when the character changes
-  useEffect(() => {
-    if (!llmModel || !llmProvider) return;
-
-    // Get character data and update config
-    const characterData = PRESET_CHARACTERS[character] as CharacterData;
-
-    const updateConfigOptions: VoiceClientConfigOption[] = [
-      {
-        service: "tts",
-        options: [{ name: "voice", value: characterData.voice }],
-      },
-      {
-        service: "llm",
-        options: [
-          {
-            name: "model",
-            value: llmModel,
-          },
-          {
-            name: "initial_messages",
-            value: [
-              {
-                role: "system",
-                content: characterData.prompt
-                  .split("\n")
-                  .map((line) => line.trim())
-                  .join("\n"),
-              },
-            ],
-          },
-        ],
-      },
-    ];
-    onConfigUpdate(updateConfigOptions, { llm: llmProvider });
-  }, [llmProvider, llmModel, onConfigUpdate, character]);
-
   const availableModels = LLM_MODEL_CHOICES.find(
     (choice) => choice.value === llmProvider
   )?.models;
 
-  return (
-    <div className="flex flex-col flex-wrap gap-4">
-      <Field label="Character preset" error={false}>
-        <div className="w-full flex flex-col md:flex-row gap-2">
-          <Select
-            disabled={inSession && !["ready", "idle"].includes(state)}
-            className="flex-1"
-            value={character}
-            onChange={(e) => setCharacter(parseInt(e.currentTarget.value))}
-          >
-            {PRESET_CHARACTERS.map(({ name }, i) => (
-              <option key={`char-${i}`} value={i}>
-                {name}
-              </option>
-            ))}
-          </Select>
-          <Button variant="light" onClick={onModifyPrompt}>
-            Customize
-          </Button>
-        </div>
-      </Field>
-
-      <Field label="LLM options" error={false}>
-        {!inSession && (
-          <div className="flex flex-row gap-2">
-            {llmProviders.map(({ value, label }) => (
-              <div
-                tabIndex={0}
-                className={cn(tileCX, value === llmProvider && tileActiveCX)}
-                key={value}
-                onClick={() => {
-                  if (!["ready", "idle"].includes(state)) return;
-
-                  setLlmProvider(value);
-                  setLlmModel(
-                    llmProviders.find((p) => p.value === value)?.models[0]
-                      .value!
-                  );
-                }}
-              >
-                <Image
-                  src={`/logo-${value}.svg`}
-                  alt={label}
-                  width="200"
-                  height="60"
-                  className="user-select-none pointer-events-none"
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        <Select
-          onChange={(e) => setLlmModel(e.currentTarget.value)}
-          value={llmModel}
-        >
-          {availableModels?.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </Field>
-    </div>
-  );
+  return <div className="flex flex-col flex-wrap gap-4"></div>;
 };
 
 export default ConfigSelect;
