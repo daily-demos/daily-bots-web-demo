@@ -36,7 +36,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
           <Button variant="light" asChild>
             <a
-              href="hhttps://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch"
+              href="https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch"
               className="text-indigo-600"
             >
               <Book className="size-6" />

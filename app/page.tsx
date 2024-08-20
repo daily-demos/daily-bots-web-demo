@@ -31,7 +31,14 @@ export default function Home() {
       timeout: BOT_READY_TIMEOUT,
       enableCam: true,
     });
-    const llmHelper = new LLMHelper({});
+    const llmHelper = new LLMHelper({
+      callbacks: {
+        onLLMFunctionCall: () => {
+          const audio = new Audio("shutter.mp3");
+          audio.play();
+        },
+      },
+    });
     voiceClient.registerHelper("llm", llmHelper);
 
     voiceClientRef.current = voiceClient;
