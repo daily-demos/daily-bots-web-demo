@@ -9,7 +9,7 @@ export const defaultServices = {
 };
 
 export const defaultConfig = [
-  { service: "vad", options: [{ name: "params", value: { stop_secs: 3.0 } }] },
+  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.3 } }] },
   {
     service: "tts",
     options: [{ name: "voice", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" }],
