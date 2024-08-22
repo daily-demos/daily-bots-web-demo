@@ -61,6 +61,7 @@ export const Session = React.memo(
         if (hasStarted) return;
 
         if (bingSoundRef.current) {
+          bingSoundRef.current.volume = 0.5;
           bingSoundRef.current.play();
         }
         setHasStarted(true);
@@ -71,6 +72,7 @@ export const Session = React.memo(
       VoiceEvent.UserStoppedSpeaking,
       useCallback(() => {
         if (bongSoundRef.current) {
+          bongSoundRef.current.volume = 0.5;
           bongSoundRef.current.play();
         }
 
