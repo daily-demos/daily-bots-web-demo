@@ -54,13 +54,14 @@ body {
   display: flex;
   flex-flow: row nowrap;
   flex: 1;
-  min-height: 100svh;
+  min-height: 100dvh;
 }
 
 main {
   display: flex;
   flex-direction: column;
   flex: 1;
+  height: 100dvh;
 }
 
 #app {
@@ -146,5 +147,5 @@ dialog::backdrop {
 
 #tray {
   overflow: hidden;
-  height: 100vh;
+  height: 100dvh;
 }

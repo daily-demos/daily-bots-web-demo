@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
+import { LineChart, Loader2, LogOut, Settings, StopCircle } from "lucide-react";
+import {
+  PipecatMetrics,
+  TransportState,
+  VoiceClientConfigOption,
+  VoiceEvent,
+} from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -27,10 +32,17 @@ export const Session = React.memo(
   ({ state, onLeave, startAudioOff = false }: SessionProps) => {
     const voiceClient = useVoiceClient()!;
     const [hasStarted, setHasStarted] = useState<boolean>(false);
-    const [showDevices, setShowDevices] = useState<boolean>(false);
+    const [showConfig, setShowConfig] = useState<boolean>(false);
     const [showStats, setShowStats] = useState<boolean>(false);
     const [muted, setMuted] = useState(startAudioOff);
+    const [runtimeConfigUpdate, setRuntimeConfigUpdate] = useState<
+      VoiceClientConfigOption[] | null
+    >(null);
+    const [updatingConfig, setUpdatingConfig] = useState<boolean>(false);
+
     const modalRef = useRef<HTMLDialogElement>(null);
+    const bingSoundRef = useRef<HTMLAudioElement>(null);
+    const bongSoundRef = useRef<HTMLAudioElement>(null);
 
     // ---- Voice Client Events
 
@@ -46,6 +58,24 @@ export const Session = React.memo(
     useVoiceClientEvent(
       VoiceEvent.BotStoppedSpeaking,
       useCallback(() => {
+        if (hasStarted) return;
+
+        if (bingSoundRef.current) {
+          bingSoundRef.current.volume = 0.5;
+          bingSoundRef.current.play();
+        }
+        setHasStarted(true);
+      }, [hasStarted])
+    );
+
+    useVoiceClientEvent(
+      VoiceEvent.UserStoppedSpeaking,
+      useCallback(() => {
+        if (bongSoundRef.current) {
+          bongSoundRef.current.volume = 0.5;
+          bongSoundRef.current.play();
+        }
+
         if (hasStarted) return;
         setHasStarted(true);
       }, [hasStarted])
@@ -81,13 +111,17 @@ export const Session = React.memo(
       // Note: backdrop doesn't currently work with dialog open, so we use setModal instead
       const current = modalRef.current;
 
-      if (current && showDevices) {
+      if (current && showConfig) {
         current.inert = true;
         current.showModal();
         current.inert = false;
       }
       return () => current?.close();
-    }, [showDevices]);
+    }, [showConfig]);
+
+    const onConfigUpdate = useCallback((config: VoiceClientConfigOption[]) => {
+      setRuntimeConfigUpdate(config);
+    }, []);
 
     function toggleMute() {
       voiceClient.enableMic(muted);
@@ -102,10 +136,32 @@ export const Session = React.memo(
               <Card.CardTitle>Configuration</Card.CardTitle>
             </Card.CardHeader>
             <Card.CardContent>
-              <Configure state={state} inSession={true} />
+              <Configure
+                state={state}
+                inSession={true}
+                handleConfigUpdate={onConfigUpdate}
+              />
             </Card.CardContent>
-            <Card.CardFooter>
-              <Button onClick={() => setShowDevices(false)}>Close</Button>
+            <Card.CardFooter isButtonArray>
+              <Button variant="outline" onClick={() => setShowConfig(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="success"
+                disabled={updatingConfig || runtimeConfigUpdate === null}
+                onClick={async () => {
+                  if (!runtimeConfigUpdate) return;
+                  setUpdatingConfig(true);
+                  await voiceClient.updateConfig(runtimeConfigUpdate);
+                  // On update, reset state
+                  setUpdatingConfig(false);
+                  setRuntimeConfigUpdate(null);
+                  setShowConfig(false);
+                }}
+              >
+                {updatingConfig && <Loader2 className="animate-spin" />}
+                {updatingConfig ? "Updating..." : "Save Changes"}
+              </Button>
             </Card.CardFooter>
           </Card.Card>
         </dialog>
@@ -175,7 +231,10 @@ export const Session = React.memo(
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowDevices(true)}
+                  onClick={() => {
+                    setRuntimeConfigUpdate(null);
+                    setShowConfig(true);
+                  }}
                 >
                   <Settings />
                 </Button>
@@ -187,6 +246,8 @@ export const Session = React.memo(
             </Button>
           </div>
         </footer>
+        <audio ref={bingSoundRef} src="/bing.wav" />
+        <audio ref={bongSoundRef} src="/bong.wav" />
       </>
     );
   },

@@ -12,11 +12,11 @@ const buttonVariants = cva(
         primary:
           "border-primary bg-primary text-primary-foreground hover:bg-primary/90 disabled:text-primary-foreground/50",
         success:
-          "border-emerald-200 bg-emerald-200 text-emerald-800 hover:bg-teal/90 disabled:text-teal-800/50",
+          "border-emerald-200 bg-emerald-200 text-emerald-800 hover:bg-teal/90 disabled:text-primary-600 disabled:bg-primary-200 disabled:border-primary-200",
         ghost:
           "border-primary-200 bg-white text-primary hover:border-primary-300 hover:bg-white/0 disabled:text-primary-foreground/50",
         outline: "button-outline",
-        light: "border-transparent bg-transparent hover:bg-primary/[.07]",
+        light: "border-transparent bg-transparent hover:bg-primary/[.05]",
         icon: "bg-transparent border-0 hover:bg-primary-200",
       },
       size: {

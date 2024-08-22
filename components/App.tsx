@@ -77,7 +77,6 @@ export default function App() {
       // Disable the mic until the bot has joined
       // to avoid interrupting the bot's welcome message
       voiceClient.enableMic(false);
-
       await voiceClient.start();
     } catch (e) {
       setError((e as VoiceError).message || "Unknown error occured");
@@ -117,7 +116,7 @@ export default function App() {
   const isReady = appState === "ready";
 
   return (
-    <Card.Card shadow className="animate-appear max-w-lg mb-14">
+    <Card.Card shadow className="animate-appear max-w-lg">
       <Card.CardHeader>
         <Card.CardTitle>Configuration</Card.CardTitle>
       </Card.CardHeader>
@@ -132,13 +131,8 @@ export default function App() {
           state={appState}
         />
       </Card.CardContent>
-      <Card.CardFooter>
-        <Button
-          key="start"
-          fullWidthMobile
-          onClick={() => start()}
-          disabled={!isReady}
-        >
+      <Card.CardFooter isButtonArray>
+        <Button key="start" onClick={() => start()} disabled={!isReady}>
           {!isReady && <Loader2 className="animate-spin" />}
           {status_text[transportState as keyof typeof status_text]}
         </Button>
