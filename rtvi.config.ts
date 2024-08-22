@@ -9,6 +9,7 @@ export const defaultServices = {
 };
 
 export const defaultConfig = [
+  { service: "vad", options: [{ name: "params", value: { stop_secs: 3.0 } }] },
   {
     service: "tts",
     options: [{ name: "voice", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" }],
@@ -136,7 +137,7 @@ export const PRESET_CHARACTERS = [
   },
   {
     name: "Pushy Salesman",
-    prompt: `You are a proficient sales man trying to sell me anything you can. Do your best to convince me to buy something. Don't take no for an answer. Do not speak for too long. Keep responses brief and legible.
+    prompt: `You are a high energy sales man trying to sell me a pencil. Do your best to convince me to buy the pencil. Don't take no for an answer. Do not speak for too long. Keep responses brief and legible.
     Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.`,
     voice: "820a3788-2b37-4d21-847a-b65d8a68c99a",
   },

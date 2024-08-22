@@ -1,15 +1,28 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { cx } from "class-variance-authority";
 import Image from "next/image";
-import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
-import { useVoiceClient } from "realtime-ai-react";
+import {
+  VoiceClientConfigOption,
+  VoiceClientServices,
+  VoiceEvent,
+} from "realtime-ai";
+import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import { CharacterContext } from "@/components/context";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { LLM_MODEL_CHOICES, PRESET_CHARACTERS } from "@/rtvi.config";
 import { cn } from "@/utils/tailwind";
+
+import StopSecs from "../StopSecs";
 
 type CharacterData = {
   name: string;
@@ -45,9 +58,18 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   inSession = false,
 }) => {
   const voiceClient = useVoiceClient();
+  const { character, setCharacter } = useContext(CharacterContext);
   const [llmProvider, setLlmProvider] = useState<string>();
   const [llmModel, setLlmModel] = useState<string>();
-  const { character, setCharacter } = useContext(CharacterContext);
+  const [vadStopSecs, setVadStopSecs] = useState<number>();
+  const [bufferedCharacter, setBufferedCharacter] = useState<number>(character);
+
+  useVoiceClientEvent(
+    VoiceEvent.ConfigUpdated,
+    useCallback(() => {
+      setCharacter(bufferedCharacter);
+    }, [bufferedCharacter, setCharacter])
+  );
 
   // Assign default values to llm provider and model from client config
   useEffect(() => {
@@ -64,16 +86,27 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
         );
       }
     });
+
+    // Get the current vad stop secs
+    voiceClient.getServiceOptionsFromConfig("vad").options.find((option) => {
+      if (option.name === "params") {
+        setVadStopSecs((option.value as { stop_secs: number }).stop_secs);
+      }
+    });
   }, [voiceClient]);
 
   // Update the config options when the character changes
   useEffect(() => {
-    if (!llmModel || !llmProvider) return;
+    if (!llmModel || !llmProvider || !vadStopSecs) return;
 
     // Get character data and update config
-    const characterData = PRESET_CHARACTERS[character] as CharacterData;
+    const characterData = PRESET_CHARACTERS[bufferedCharacter] as CharacterData;
 
-    const updateConfigOptions: VoiceClientConfigOption[] = [
+    const updatedConfigOptions: VoiceClientConfigOption[] = [
+      {
+        service: "vad",
+        options: [{ name: "params", value: { stop_secs: vadStopSecs } }],
+      },
       {
         service: "tts",
         options: [{ name: "voice", value: characterData.voice }],
@@ -100,8 +133,9 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
         ],
       },
     ];
-    onConfigUpdate(updateConfigOptions, { llm: llmProvider });
-  }, [llmProvider, llmModel, onConfigUpdate, character]);
+
+    onConfigUpdate(updatedConfigOptions, { llm: llmProvider });
+  }, [llmProvider, llmModel, onConfigUpdate, bufferedCharacter, vadStopSecs]);
 
   const availableModels = LLM_MODEL_CHOICES.find(
     (choice) => choice.value === llmProvider
@@ -109,67 +143,98 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
 
   return (
     <div className="flex flex-col flex-wrap gap-4">
-      <Field label="Character preset" error={false}>
-        <div className="w-full flex flex-col md:flex-row gap-2">
-          <Select
-            disabled={inSession && !["ready", "idle"].includes(state)}
-            className="flex-1"
-            value={character}
-            onChange={(e) => setCharacter(parseInt(e.currentTarget.value))}
-          >
-            {PRESET_CHARACTERS.map(({ name }, i) => (
-              <option key={`char-${i}`} value={i}>
-                {name}
-              </option>
-            ))}
-          </Select>
-          <Button variant="light" onClick={onModifyPrompt}>
-            Customize
-          </Button>
-        </div>
-      </Field>
-
-      <Field label="LLM options" error={false}>
-        {!inSession && (
-          <div className="flex flex-row gap-2">
-            {llmProviders.map(({ value, label }) => (
-              <div
-                tabIndex={0}
-                className={cn(tileCX, value === llmProvider && tileActiveCX)}
-                key={value}
-                onClick={() => {
-                  if (!["ready", "idle"].includes(state)) return;
-
-                  setLlmProvider(value);
-                  setLlmModel(
-                    llmProviders.find((p) => p.value === value)?.models[0]
-                      .value!
-                  );
-                }}
-              >
-                <Image
-                  src={`/logo-${value}.svg`}
-                  alt={label}
-                  width="200"
-                  height="60"
-                  className="user-select-none pointer-events-none"
-                />
+      <Accordion type="single" collapsible>
+        <AccordionItem value="character">
+          <AccordionTrigger>Character</AccordionTrigger>
+          <AccordionContent>
+            <Field error={false}>
+              <div className="w-full flex flex-col md:flex-row gap-2">
+                <Select
+                  disabled={inSession && !["ready", "idle"].includes(state)}
+                  className="flex-1"
+                  value={bufferedCharacter}
+                  onChange={(e) =>
+                    setBufferedCharacter(parseInt(e.currentTarget.value))
+                  }
+                >
+                  {PRESET_CHARACTERS.map(({ name }, i) => (
+                    <option key={`char-${i}`} value={i}>
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+                <Button variant="light" onClick={onModifyPrompt}>
+                  Customize
+                </Button>
               </div>
-            ))}
-          </div>
-        )}
+            </Field>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="llm">
+          <AccordionTrigger>LLM options</AccordionTrigger>
+          <AccordionContent>
+            <Field error={false}>
+              {!inSession && (
+                <>
+                  <Label>Provider</Label>
+                  <div className="flex flex-row gap-2">
+                    {llmProviders.map(({ value, label }) => (
+                      <div
+                        tabIndex={0}
+                        className={cn(
+                          tileCX,
+                          value === llmProvider && tileActiveCX
+                        )}
+                        key={value}
+                        onClick={() => {
+                          if (!["ready", "idle"].includes(state)) return;
 
-        <Select
-          onChange={(e) => setLlmModel(e.currentTarget.value)}
-          value={llmModel}
-        >
-          {availableModels?.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </Field>
+                          setLlmProvider(value);
+                          setLlmModel(
+                            llmProviders.find((p) => p.value === value)
+                              ?.models[0].value!
+                          );
+                        }}
+                      >
+                        <Image
+                          src={`/logo-${value}.svg`}
+                          alt={label}
+                          width="200"
+                          height="60"
+                          className="user-select-none pointer-events-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <Label>Model</Label>
+              <Select
+                onChange={(e) => setLlmModel(e.currentTarget.value)}
+                value={llmModel}
+              >
+                {availableModels?.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="voice">
+          <AccordionTrigger>Voice config</AccordionTrigger>
+          <AccordionContent>
+            <StopSecs
+              vadStopSecs={vadStopSecs}
+              handleChange={(v) => {
+                setVadStopSecs(v[0]);
+              }}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 };

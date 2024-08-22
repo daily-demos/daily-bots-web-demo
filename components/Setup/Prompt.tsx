@@ -83,17 +83,15 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
           ))}
         </div>
       </Card.CardContent>
-      <Card.CardFooter>
-        <div className="flex flex-row gap-2">
-          <Button onClick={handleClose}>Close</Button>
-          <Button
-            variant={hasUnsavedChanges ? "success" : "outline"}
-            onClick={() => save()}
-            disabled={!hasUnsavedChanges}
-          >
-            Update
-          </Button>
-        </div>
+      <Card.CardFooter isButtonArray>
+        <Button onClick={handleClose}>Close</Button>
+        <Button
+          variant={hasUnsavedChanges ? "success" : "outline"}
+          onClick={() => save()}
+          disabled={!hasUnsavedChanges}
+        >
+          Update
+        </Button>
       </Card.CardFooter>
     </Card.Card>
   );

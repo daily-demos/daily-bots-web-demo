@@ -82,19 +82,24 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
 );
 CardContent.displayName = "CardContent";
 
-const CardFooter = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "flex justify-center items-center p-6 pt-0 lg:p-9 lg:pt-0",
-      className
-    )}
-    {...props}
-  />
-));
+interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  shadow?: boolean;
+  isButtonArray?: boolean;
+}
+
+const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
+  ({ className, isButtonArray, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "flex justify-center items-center p-6 pt-0 lg:p-9 lg:pt-0",
+        isButtonArray && "gap-2 flex-col md:flex-row *:w-full md:*:w-auto",
+        className
+      )}
+      {...props}
+    />
+  )
+);
 CardFooter.displayName = "CardFooter";
 
 export {

@@ -13,12 +13,19 @@ import Prompt from "./Prompt";
 interface ConfigureProps {
   state: string;
   startAudioOff?: boolean;
-  handleStartAudioOff?: () => void;
   inSession?: boolean;
+  handleStartAudioOff?: () => void;
+  handleConfigUpdate?: (config: VoiceClientConfigOption[]) => void;
 }
 
 export const Configure: React.FC<ConfigureProps> = React.memo(
-  ({ startAudioOff, handleStartAudioOff, state, inSession = false }) => {
+  ({
+    startAudioOff,
+    state,
+    inSession = false,
+    handleStartAudioOff,
+    handleConfigUpdate,
+  }) => {
     const voiceClient = useVoiceClient()!;
     const [showPrompt, setshowPrompt] = useState<boolean>(false);
     const modalRef = useRef<HTMLDialogElement>(null);
@@ -45,24 +52,21 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
           voiceClient.partialToConfig(config);
 
         if (inSession) {
-          await voiceClient.updateConfig(newConfig);
-        } else {
-          voiceClient.updateConfig(newConfig);
+          handleConfigUpdate?.(newConfig);
+          return;
         }
 
         try {
-          if (
-            !inSession &&
-            services &&
-            services.llm !== voiceClient.services.llm
-          ) {
+          if (services && services.llm !== voiceClient.services.llm) {
             voiceClient.services = { ...voiceClient.services, ...services };
           }
         } catch (e) {
           return;
         }
+
+        voiceClient.updateConfig(newConfig);
       },
-      [voiceClient, inSession]
+      [voiceClient, inSession, handleConfigUpdate]
     );
 
     return (
@@ -82,7 +86,7 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
         </section>
 
         {!inSession && (
-          <section className="flex flex-col gap-4 border-y border-primary-hairline py-4 mt-4">
+          <section className="flex flex-col gap-4 border-y border-primary-hairline py-4">
             <div className="flex flex-row justify-between items-center">
               <Label className="flex flex-row gap-1 items-center">
                 Join with mic muted{" "}
