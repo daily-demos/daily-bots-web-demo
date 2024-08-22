@@ -10,7 +10,7 @@ interface StopSecsProps {
 }
 
 const StopSecs: React.FC<StopSecsProps> = ({
-  vadStopSecs = 0.3,
+  vadStopSecs = 0.8,
   handleChange,
 }) => {
   const [stopSecs, setStopSecs] = useState<number[]>([vadStopSecs]);
