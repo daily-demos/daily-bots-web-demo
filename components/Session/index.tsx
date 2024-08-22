@@ -41,6 +41,8 @@ export const Session = React.memo(
     const [updatingConfig, setUpdatingConfig] = useState<boolean>(false);
 
     const modalRef = useRef<HTMLDialogElement>(null);
+    const bingSoundRef = useRef<HTMLAudioElement>(null);
+    const bongSoundRef = useRef<HTMLAudioElement>(null);
 
     // ---- Voice Client Events
 
@@ -56,6 +58,22 @@ export const Session = React.memo(
     useVoiceClientEvent(
       VoiceEvent.BotStoppedSpeaking,
       useCallback(() => {
+        if (hasStarted) return;
+
+        if (bingSoundRef.current) {
+          bingSoundRef.current.play();
+        }
+        setHasStarted(true);
+      }, [hasStarted])
+    );
+
+    useVoiceClientEvent(
+      VoiceEvent.UserStoppedSpeaking,
+      useCallback(() => {
+        if (bongSoundRef.current) {
+          bongSoundRef.current.play();
+        }
+
         if (hasStarted) return;
         setHasStarted(true);
       }, [hasStarted])
@@ -226,6 +244,8 @@ export const Session = React.memo(
             </Button>
           </div>
         </footer>
+        <audio ref={bingSoundRef} src="/bing.wav" />
+        <audio ref={bongSoundRef} src="/bong.wav" />
       </>
     );
   },

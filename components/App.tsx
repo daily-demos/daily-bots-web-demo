@@ -116,7 +116,7 @@ export default function App() {
   const isReady = appState === "ready";
 
   return (
-    <Card.Card shadow className="animate-appear max-w-lg mb-14">
+    <Card.Card shadow className="animate-appear max-w-lg">
       <Card.CardHeader>
         <Card.CardTitle>Configuration</Card.CardTitle>
       </Card.CardHeader>
