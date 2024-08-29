@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { cx } from "class-variance-authority";
+import { Languages } from "lucide-react";
 import Image from "next/image";
 import {
   VoiceClientConfigOption,
@@ -8,7 +9,7 @@ import {
 } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
-import { CharacterContext } from "@/components/context";
+import { AppContext } from "@/components/context";
 import {
   Accordion,
   AccordionContent,
@@ -19,7 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { LLM_MODEL_CHOICES, PRESET_CHARACTERS } from "@/rtvi.config";
+import {
+  defaultLLMPrompt,
+  LANGUAGES,
+  LLM_MODEL_CHOICES,
+  PRESET_CHARACTERS,
+} from "@/rtvi.config";
 import { cn } from "@/utils/tailwind";
 
 import StopSecs from "../StopSecs";
@@ -58,7 +64,8 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   inSession = false,
 }) => {
   const voiceClient = useVoiceClient();
-  const { character, setCharacter } = useContext(CharacterContext);
+  const { character, setCharacter, language, setLanguage } =
+    useContext(AppContext);
   const [llmProvider, setLlmProvider] = useState<string>();
   const [llmModel, setLlmModel] = useState<string>();
   const [vadStopSecs, setVadStopSecs] = useState<number>();
@@ -71,71 +78,115 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     }, [bufferedCharacter, setCharacter])
   );
 
-  // Assign default values to llm provider and model from client config
+  // Assign default values from client config
   useEffect(() => {
     if (!voiceClient) return;
 
     // Get the current llm provider and model
-    setLlmProvider(voiceClient?.services.llm ?? llmProviders[0].value);
+    setLlmProvider(voiceClient.services.llm ?? llmProviders[0].value);
 
-    // Get the current llm model
-    voiceClient.getServiceOptionsFromConfig("llm").options.find((option) => {
-      if (option.name === "model") {
-        setLlmModel(
-          (option.value as string) ?? llmProviders[0].models[0].value
-        );
-      }
-    });
+    // Get the current config llm model
+    setLlmModel(
+      voiceClient.getServiceOptionValueFromConfig("llm", "model") as string
+    );
 
-    // Get the current vad stop secs
-    voiceClient.getServiceOptionsFromConfig("vad").options.find((option) => {
-      if (option.name === "params") {
-        setVadStopSecs((option.value as { stop_secs: number }).stop_secs);
-      }
-    });
+    // Get the current config vad stop secs
+    setVadStopSecs(
+      (
+        voiceClient.getServiceOptionValueFromConfig("vad", "params") as {
+          stop_secs: number;
+        }
+      ).stop_secs
+    );
   }, [voiceClient]);
 
   // Update the config options when the character changes
   useEffect(() => {
-    if (!llmModel || !llmProvider || !vadStopSecs) return;
+    if (!llmModel || !llmProvider || !vadStopSecs || !voiceClient) return;
 
     // Get character data and update config
     const characterData = PRESET_CHARACTERS[bufferedCharacter] as CharacterData;
 
-    const updatedConfigOptions: VoiceClientConfigOption[] = [
-      {
-        service: "vad",
-        options: [{ name: "params", value: { stop_secs: vadStopSecs } }],
-      },
-      {
-        service: "tts",
-        options: [{ name: "voice", value: characterData.voice }],
-      },
-      {
-        service: "llm",
-        options: [
-          {
-            name: "model",
-            value: llmModel,
-          },
-          {
-            name: "initial_messages",
-            value: [
-              {
-                role: "system",
-                content: characterData.prompt
-                  .split("\n")
-                  .map((line) => line.trim())
-                  .join("\n"),
-              },
-            ],
-          },
-        ],
-      },
-    ];
+    // Update VAD stop secs
+    const updatedConfig: VoiceClientConfigOption[] =
+      voiceClient.setConfigOptions([
+        {
+          service: "vad",
+          options: [{ name: "params", value: { stop_secs: vadStopSecs } }],
+        },
+        {
+          service: "tts",
+          options: [
+            {
+              name: "voice",
+              value:
+                language !== 0
+                  ? LANGUAGES[language].default_voice
+                  : characterData.voice,
+            },
+            {
+              name: "model",
+              value: LANGUAGES[language].tts_model,
+            },
+            {
+              name: "language",
+              value: LANGUAGES[language].value,
+            },
+          ],
+        },
+        {
+          service: "llm",
+          options: [
+            {
+              name: "model",
+              value: llmModel,
+            },
+            {
+              name: "initial_messages",
+              value: [
+                {
+                  role: "system",
+                  content:
+                    language !== 0
+                      ? defaultLLMPrompt +
+                        `\nRespond only in ${LANGUAGES[language].label} please.`
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .join("\n")
+                      : characterData.prompt
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .join("\n"),
+                },
+              ],
+            },
+          ],
+        },
+        {
+          service: "stt",
+          options: [
+            {
+              name: "model",
+              value: LANGUAGES[language].stt_model,
+            },
+            {
+              name: "language",
+              value: LANGUAGES[language].value,
+            },
+          ],
+        },
+      ]);
 
-    onConfigUpdate(updatedConfigOptions, { llm: llmProvider });
-  }, [llmProvider, llmModel, onConfigUpdate, bufferedCharacter, vadStopSecs]);
+    onConfigUpdate(updatedConfig, { llm: llmProvider });
+  }, [
+    llmProvider,
+    llmModel,
+    language,
+    voiceClient,
+    onConfigUpdate,
+    bufferedCharacter,
+    vadStopSecs,
+  ]);
 
   const availableModels = LLM_MODEL_CHOICES.find(
     (choice) => choice.value === llmProvider
@@ -143,33 +194,48 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
 
   return (
     <div className="flex flex-col flex-wrap gap-4">
+      <Field label="Language" error={false}>
+        <Select
+          onChange={(e) => setLanguage(parseInt(e.currentTarget.value))}
+          value={language}
+          icon={<Languages size={24} />}
+        >
+          {LANGUAGES.map((lang, i) => (
+            <option key={lang.label} value={i}>
+              {lang.label}
+            </option>
+          ))}
+        </Select>
+      </Field>
       <Accordion type="single" collapsible>
-        <AccordionItem value="character">
-          <AccordionTrigger>Character</AccordionTrigger>
-          <AccordionContent>
-            <Field error={false}>
-              <div className="w-full flex flex-col md:flex-row gap-2">
-                <Select
-                  disabled={inSession && !["ready", "idle"].includes(state)}
-                  className="flex-1"
-                  value={bufferedCharacter}
-                  onChange={(e) =>
-                    setBufferedCharacter(parseInt(e.currentTarget.value))
-                  }
-                >
-                  {PRESET_CHARACTERS.map(({ name }, i) => (
-                    <option key={`char-${i}`} value={i}>
-                      {name}
-                    </option>
-                  ))}
-                </Select>
-                <Button variant="light" onClick={onModifyPrompt}>
-                  Customize
-                </Button>
-              </div>
-            </Field>
-          </AccordionContent>
-        </AccordionItem>
+        {language === 0 && (
+          <AccordionItem value="character">
+            <AccordionTrigger>Character</AccordionTrigger>
+            <AccordionContent>
+              <Field error={false}>
+                <div className="w-full flex flex-col md:flex-row gap-2">
+                  <Select
+                    disabled={inSession && !["ready", "idle"].includes(state)}
+                    className="flex-1"
+                    value={bufferedCharacter}
+                    onChange={(e) =>
+                      setBufferedCharacter(parseInt(e.currentTarget.value))
+                    }
+                  >
+                    {PRESET_CHARACTERS.map(({ name }, i) => (
+                      <option key={`char-${i}`} value={i}>
+                        {name}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button variant="light" onClick={onModifyPrompt}>
+                    Customize
+                  </Button>
+                </div>
+              </Field>
+            </AccordionContent>
+          </AccordionItem>
+        )}
         <AccordionItem value="llm">
           <AccordionTrigger>LLM options</AccordionTrigger>
           <AccordionContent>

@@ -1,30 +1,41 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useState } from "react";
 
-interface CharacterContextType {
+import { LANGUAGES } from "@/rtvi.config";
+
+interface AppContextType {
   character: number;
   setCharacter: (value: number) => void;
+  language: number;
+  setLanguage: (value: number) => void;
 }
 
-export const CharacterContext = createContext<CharacterContextType>({
+export const AppContext = createContext<AppContextType>({
   character: 0,
   setCharacter: () => {
     throw new Error("setCharacter function must be overridden");
   },
+  language: 0,
+  setLanguage: () => {
+    throw new Error("setLanguage function must be overridden");
+  },
 });
-CharacterContext.displayName = "CharacterContext";
+AppContext.displayName = "AppContext";
 
-type CharacterProviderProps = {
+type AppContextProps = {
   children: ReactNode;
 };
 
-export const CharacterProvider: React.FC<
-  React.PropsWithChildren<CharacterProviderProps>
+export const AppProvider: React.FC<
+  React.PropsWithChildren<AppContextProps>
 > = ({ children }) => {
   const [character, setCharacter] = useState<number>(0);
+  const [language, setLanguage] = useState<number>(0);
 
   return (
-    <CharacterContext.Provider value={{ character, setCharacter }}>
+    <AppContext.Provider
+      value={{ character, setCharacter, language, setLanguage }}
+    >
       {children}
-    </CharacterContext.Provider>
+    </AppContext.Provider>
   );
 };
