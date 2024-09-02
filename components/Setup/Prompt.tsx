@@ -1,11 +1,5 @@
-import React, { useState } from "react";
-import {
-  ConfigOption,
-  LLMContextMessage,
-  LLMHelper,
-  VoiceClientConfigOption,
-  VoiceEvent,
-} from "realtime-ai";
+import React, { useEffect, useState } from "react";
+import { LLMContextMessage, LLMHelper, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import { Button } from "../ui/button";
@@ -13,40 +7,58 @@ import * as Card from "../ui/card";
 import { Textarea } from "../ui/textarea";
 
 type PromptProps = {
+  handleUpdate: (context: LLMContextMessage[]) => void;
   handleClose: () => void;
+  characterPrompt?: string;
 };
 
-const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
+const Prompt: React.FC<PromptProps> = ({
+  handleUpdate,
+  handleClose,
+  characterPrompt,
+}) => {
   const voiceClient = useVoiceClient()!;
   const [prompt, setPrompt] = useState<LLMContextMessage[] | undefined>(
     undefined
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  useVoiceClientEvent(
-    VoiceEvent.ConfigUpdated,
-    (config: VoiceClientConfigOption[]) => {
-      const p = config
-        .find((c: VoiceClientConfigOption) => c.service === "llm")
-        ?.options?.find((o: ConfigOption) => o.name === "initial_messages")
-        ?.value as LLMContextMessage[] | undefined;
+  useEffect(() => {
+    (async function getPrompt() {
+      const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+      const p: LLMContextMessage[] = await llmHelper.getContext();
+
+      if (!p || !p.length) return;
 
       setPrompt(p);
-    }
-  );
+    })();
+  }, [voiceClient]);
+
+  useVoiceClientEvent(VoiceEvent.ConfigUpdated, async () => {
+    const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+    const p: LLMContextMessage[] = await llmHelper.getContext();
+
+    setPrompt(p);
+  });
+
+  useEffect(() => {
+    if (!characterPrompt) return;
+
+    setPrompt([
+      {
+        role: "system",
+        content: characterPrompt
+          .split("\n")
+          .map((line) => line.trim())
+          .join("\n"),
+      },
+    ]);
+  }, [characterPrompt]);
 
   function save() {
-    if (!voiceClient) return;
+    if (!voiceClient || !prompt) return;
 
-    if (voiceClient.state === "ready") {
-      const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-      llmHelper.setContext({ messages: prompt }, true);
-    } else {
-      voiceClient.setServiceOptionInConfig("llm", {
-        name: "initial_messages",
-        value: prompt,
-      });
-    }
+    handleUpdate(prompt);
 
     setHasUnsavedChanges(false);
   }
@@ -56,6 +68,7 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
       if (!prev) return prev;
       const newPrompt = [...prev];
       newPrompt[index].content = content;
+
       return newPrompt;
     });
     setHasUnsavedChanges(true);
@@ -87,7 +100,10 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
         <Button onClick={handleClose}>Close</Button>
         <Button
           variant={hasUnsavedChanges ? "success" : "outline"}
-          onClick={() => save()}
+          onClick={() => {
+            save();
+            handleClose();
+          }}
           disabled={!hasUnsavedChanges}
         >
           Update

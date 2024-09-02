@@ -130,30 +130,3 @@
   font-weight: theme(fontWeight.semibold);
   color: theme(colors.primary.500);
 }
-
-.face {
-  animation: faceAppear 1s ease-out forwards;
-  position: relative;
-  z-index: 2;
-}
-
-.faceBubble {
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  border-radius: 999px;
-  z-index: 1;
-  background-color: theme(colors.primary.700);
-  transition: transform 0.1s ease;
-}
-
-@keyframes faceAppear {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
