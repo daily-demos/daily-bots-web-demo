@@ -48,11 +48,8 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
         config: VoiceClientConfigOption[],
         services: VoiceClientServices | undefined
       ) => {
-        const newConfig: VoiceClientConfigOption[] =
-          voiceClient.partialToConfig(config);
-
         if (inSession) {
-          handleConfigUpdate?.(newConfig);
+          handleConfigUpdate?.(config);
           return;
         }
 
@@ -64,7 +61,7 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
           return;
         }
 
-        voiceClient.updateConfig(newConfig);
+        voiceClient.updateConfig(config, true);
       },
       [voiceClient, inSession, handleConfigUpdate]
     );

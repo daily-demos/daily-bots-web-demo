@@ -10,7 +10,7 @@ interface StopSecsProps {
 }
 
 const StopSecs: React.FC<StopSecsProps> = ({
-  vadStopSecs = 0.8,
+  vadStopSecs = 0.3,
   handleChange,
 }) => {
   const [stopSecs, setStopSecs] = useState<number[]>([vadStopSecs]);
@@ -30,7 +30,7 @@ const StopSecs: React.FC<StopSecsProps> = ({
         <Slider
           value={stopSecs}
           min={0.1}
-          max={5}
+          max={2}
           step={0.1}
           onValueChange={handleValueChange}
         />
