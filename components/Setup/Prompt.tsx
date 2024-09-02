@@ -1,11 +1,5 @@
-import React, { useState } from "react";
-import {
-  ConfigOption,
-  LLMContextMessage,
-  LLMHelper,
-  VoiceClientConfigOption,
-  VoiceEvent,
-} from "realtime-ai";
+import React, { useEffect, useState } from "react";
+import { LLMContextMessage, LLMHelper, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import { Button } from "../ui/button";
@@ -23,30 +17,31 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  useVoiceClientEvent(
-    VoiceEvent.ConfigUpdated,
-    (config: VoiceClientConfigOption[]) => {
-      const p = config
-        .find((c: VoiceClientConfigOption) => c.service === "llm")
-        ?.options?.find((o: ConfigOption) => o.name === "initial_messages")
-        ?.value as LLMContextMessage[] | undefined;
+  useEffect(() => {
+    console.log("B");
+    const p = voiceClient.getServiceOptionValueFromConfig(
+      "llm",
+      "initial_messages"
+    ) as LLMContextMessage[] | undefined;
 
-      setPrompt(p);
-    }
-  );
+    if (!p || !p.length) return;
 
-  function save() {
+    setPrompt(p);
+  }, [voiceClient]);
+
+  useVoiceClientEvent(VoiceEvent.ConfigUpdated, async () => {
+    const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+    const p: LLMContextMessage[] = await llmHelper.getContext();
+
+    console.log("A", p);
+    setPrompt(p);
+  });
+
+  async function save() {
     if (!voiceClient) return;
 
-    if (voiceClient.state === "ready") {
-      const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-      llmHelper.setContext({ messages: prompt }, true);
-    } else {
-      voiceClient.setServiceOptionInConfig("llm", {
-        name: "initial_messages",
-        value: prompt,
-      });
-    }
+    const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+    await llmHelper.setContext({ messages: prompt }, true);
 
     setHasUnsavedChanges(false);
   }
@@ -56,6 +51,7 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
       if (!prev) return prev;
       const newPrompt = [...prev];
       newPrompt[index].content = content;
+
       return newPrompt;
     });
     setHasUnsavedChanges(true);
@@ -87,7 +83,10 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
         <Button onClick={handleClose}>Close</Button>
         <Button
           variant={hasUnsavedChanges ? "success" : "outline"}
-          onClick={() => save()}
+          onClick={() => {
+            save();
+            handleClose();
+          }}
           disabled={!hasUnsavedChanges}
         >
           Update

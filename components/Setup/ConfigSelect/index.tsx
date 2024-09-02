@@ -79,7 +79,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     setLlmProvider(voiceClient?.services.llm ?? llmProviders[0].value);
 
     // Get the current llm model
-    voiceClient.getServiceOptionsFromConfig("llm").options.find((option) => {
+    voiceClient.getServiceOptionsFromConfig("llm")?.options.find((option) => {
       if (option.name === "model") {
         setLlmModel(
           (option.value as string) ?? llmProviders[0].models[0].value
@@ -88,7 +88,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     });
 
     // Get the current vad stop secs
-    voiceClient.getServiceOptionsFromConfig("vad").options.find((option) => {
+    voiceClient.getServiceOptionsFromConfig("vad")?.options.find((option) => {
       if (option.name === "params") {
         setVadStopSecs((option.value as { stop_secs: number }).stop_secs);
       }

@@ -64,6 +64,8 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
           return;
         }
 
+        console.log("CONFIG HANDLER", newConfig);
+
         voiceClient.updateConfig(newConfig);
       },
       [voiceClient, inSession, handleConfigUpdate]
