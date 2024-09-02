@@ -11,11 +11,9 @@ const ModelBadge: React.FC = () => {
   const getModelFromConfig = () => {
     if (!voiceClient) return;
 
-    voiceClient.getServiceOptionsFromConfig("llm").options.find((option) => {
-      if (option.name === "model") {
-        setModel(option.value as string);
-      }
-    });
+    setModel(
+      voiceClient.getServiceOptionValueFromConfig("llm", "model") as string
+    );
   };
 
   useVoiceClientEvent(VoiceEvent.ConfigUpdated, () => {

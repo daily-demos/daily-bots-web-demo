@@ -7,10 +7,16 @@ import * as Card from "../ui/card";
 import { Textarea } from "../ui/textarea";
 
 type PromptProps = {
+  handleUpdate: (context: LLMContextMessage[]) => void;
   handleClose: () => void;
+  characterPrompt?: string;
 };
 
-const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
+const Prompt: React.FC<PromptProps> = ({
+  handleUpdate,
+  handleClose,
+  characterPrompt,
+}) => {
   const voiceClient = useVoiceClient()!;
   const [prompt, setPrompt] = useState<LLMContextMessage[] | undefined>(
     undefined
@@ -18,30 +24,41 @@ const Prompt: React.FC<PromptProps> = ({ handleClose }) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("B");
-    const p = voiceClient.getServiceOptionValueFromConfig(
-      "llm",
-      "initial_messages"
-    ) as LLMContextMessage[] | undefined;
+    (async function getPrompt() {
+      const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+      const p: LLMContextMessage[] = await llmHelper.getContext();
 
-    if (!p || !p.length) return;
+      if (!p || !p.length) return;
 
-    setPrompt(p);
+      setPrompt(p);
+    })();
   }, [voiceClient]);
 
   useVoiceClientEvent(VoiceEvent.ConfigUpdated, async () => {
     const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
     const p: LLMContextMessage[] = await llmHelper.getContext();
 
-    console.log("A", p);
     setPrompt(p);
   });
 
-  async function save() {
-    if (!voiceClient) return;
+  useEffect(() => {
+    if (!characterPrompt) return;
 
-    const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-    await llmHelper.setContext({ messages: prompt }, true);
+    setPrompt([
+      {
+        role: "system",
+        content: characterPrompt
+          .split("\n")
+          .map((line) => line.trim())
+          .join("\n"),
+      },
+    ]);
+  }, [characterPrompt]);
+
+  function save() {
+    if (!voiceClient || !prompt) return;
+
+    handleUpdate(prompt);
 
     setHasUnsavedChanges(false);
   }

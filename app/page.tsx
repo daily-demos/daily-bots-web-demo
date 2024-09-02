@@ -7,7 +7,7 @@ import { DailyVoiceClient } from "realtime-ai-daily";
 import { VoiceClientAudio, VoiceClientProvider } from "realtime-ai-react";
 
 import App from "@/components/App";
-import { CharacterProvider } from "@/components/context";
+import { AppProvider } from "@/components/context";
 import Header from "@/components/Header";
 import Splash from "@/components/Splash";
 import {
@@ -43,7 +43,7 @@ export default function Home() {
 
   return (
     <VoiceClientProvider voiceClient={voiceClientRef.current!}>
-      <CharacterProvider>
+      <AppProvider>
         <TooltipProvider>
           <main>
             <Header />
@@ -53,7 +53,7 @@ export default function Home() {
           </main>
           <aside id="tray" />
         </TooltipProvider>
-      </CharacterProvider>
+      </AppProvider>
       <VoiceClientAudio />
     </VoiceClientProvider>
   );

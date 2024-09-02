@@ -2,10 +2,9 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { VoiceEvent } from "realtime-ai";
-import { useVoiceClientEvent } from "realtime-ai-react";
+import { useVoiceClientEvent, VoiceVisualizer } from "realtime-ai-react";
 
 import ModelBadge from "./model";
-import WaveForm from "./waveform";
 
 import styles from "./styles.module.css";
 
@@ -67,7 +66,7 @@ export const Agent: React.FC<{
               <Loader2 size={32} className="animate-spin" />
             </span>
           ) : (
-            <WaveForm />
+            <VoiceVisualizer participantType="bot" barColor="#FFFFFF" />
           )}
         </div>
       </div>
