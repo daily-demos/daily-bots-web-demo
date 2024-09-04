@@ -28,13 +28,21 @@ cp env.example .env.local
 ### Install dependencies
 
 ```shell
-yarn 
+yarn install
+```
+or
+```shell
+npm install
 ```
 
 ### Run the project
 
 ```shell
 yarn run dev
+```
+or
+```shell
+npm run dev
 ```
 
 ## How does this work?
