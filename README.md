@@ -1,5 +1,5 @@
 [![Try](https://img.shields.io/badge/try_it-here-blue)](https://demo.dailybots.ai)
-[![Deploy](https://img.shields.io/badge/Deploy_to_Vercel-black?style=flat&logo=Vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdaily-demos%2Fdaily-bots-web-demo&env=DAILY_BOTS_URL,DAILY_API_KEY,NEXT_PUBLIC_BASE_URL&project-name=daily-bots-demo&repository-name=daily-bots-web-demo)
+[![Deploy](https://img.shields.io/badge/Deploy_to_Vercel-black?style=flat&logo=Vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdaily-demos%2Fdaily-bots-web-demo&env=DAILY_API_KEY,DAILY_BOTS_URL,NEXT_PUBLIC_BASE_URL&project-name=daily-bots-demo&repository-name=daily-bots-web-demo)
 
 
 <img src="public/icon.png" width="120px">
@@ -9,11 +9,6 @@
 
 Example NextJS app that demonstrates core capabilities of [Daily Bots](https://bots.daily.co). 
 
-## Other demos
-
-- [Vision](https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch) - Anthropic, describe webcam.
-- [Function calling](https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-call) - Anthropic, function calling (get current weather)
-
 ## Getting started
 
 ### Configure your local environment
@@ -22,25 +17,32 @@ Example NextJS app that demonstrates core capabilities of [Daily Bots](https://b
 cp env.example .env.local
 ```
 
-`NEXT_PUBLIC_BASE_URL` defaults to `/api`, which is configured as Next server-side route handler. You can pass through service API keys, override service and config options within this route.
+`DAILY_API_KEY`: Your Daily API key obtained by registering at https://bots.daily.co.
 
-`DAILY_BOTS_URL` URL of the Daily Bots `start` endpoint (https://api.daily.co/v1/bots/start)
+`DAILY_BOTS_URL`: URL of the Daily Bots `start` endpoint. Default: https://api.daily.co/v1/bots/start.
 
+`NEXT_PUBLIC_BASE_URL`: Next server-side route handler. You can pass through service API keys, override service and config options within this route. Default: `/api`
 
-`DAILY_API_KEY` your Daily API key obtained by registering at https://bots.daily.co.
-
-`OPENAI_API_KEY` Optional: provide a OpenAI API key. Daily Bots does not provide an integrated OpenAI service, so to use it, you will need to provide your own key. You can read more about integrated and 'bring your own key' [here](https://docs.dailybots.ai/api-reference/client/supportedServices).
+`OPENAI_API_KEY`: Optional: provide a OpenAI API key. Read more about integrated and supported services [here](https://docs.dailybots.ai/api-reference/client/supportedServices).
 
 ### Install dependencies
 
 ```shell
-yarn 
+yarn install
+```
+or
+```shell
+npm install
 ```
 
 ### Run the project
 
 ```shell
 yarn run dev
+```
+or
+```shell
+npm run dev
 ```
 
 ## How does this work?
@@ -57,7 +59,6 @@ Learn more about the RTVI web client libraries [on the docs](https://docs.rtvi.a
 ### Configuration
 
 All Voice Client configuration can be found in the [rtvi.config.ts](/rtvi.config.ts) file. You can edit any prompts, services of config settings in this file.
-
 
 ### API routes
 
@@ -78,3 +79,8 @@ Daily Bots `https://api.daily.co/v1/bots/start` has some required properties, wh
 - `config`
 - `services`
 - Optional, if using OpenAI: `api_keys`
+
+## Other demos
+
+- [Vision](https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch) - Anthropic, describe webcam.
+- [Function calling](https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-call) - Anthropic, function calling (get current weather)
