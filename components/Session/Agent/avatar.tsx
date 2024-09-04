@@ -18,6 +18,13 @@ export const Avatar: React.FC = () => {
     }, [])
   );
 
+  useVoiceClientEvent(
+    VoiceEvent.LLMJsonCompletion,
+    useCallback((data: string) => {
+      console.log("LLMJsonCompletion", data);
+    }, [])
+  );
+
   return (
     <>
       <Image src={FaceSVG} alt="Face" className={styles.face} />

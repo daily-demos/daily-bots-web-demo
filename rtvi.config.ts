@@ -59,10 +59,21 @@ export const defaultServices = {
   tts: "cartesia",
 };
 
+const content = `
+      You are an English teacher named Uncle Jeff. Your job is to teach words you receive from the get_vocabulary_word tool.
+
+  Keep responses brief and legible.
+  Only use words a 3rd grader would understand.
+  Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.
+  Start by briefly introducing yourself and asking my name.
+
+  You teach these words by introducing each one one at a time and then asking me to provide an example sentence for each word. Do not move on to the next word until I provide a perfect sentence.
+    `;
+
 export const defaultConfig = [
   {
     service: "tts",
-    options: [{ name: "voice", value: "d46abd1d-2d02-43e8-819f-51fb652c1c61" }],
+    options: [{ name: "voice", value: "69267136-1bdc-412f-ad78-0caad210fb40" }],
   },
   {
     service: "llm",
@@ -76,44 +87,11 @@ export const defaultConfig = [
             // anthropic: user; openai: system
 
             role: "system",
-            content:
-              "You are a TV weatherman named Wally. Your job is to present the weather to me. You can call the 'get_weather' function to get weather information. Start by asking me for my location. Then, use 'get_weather' to give me a forecast. Then, answer any questions I have about the weather. Keep your introduction and responses very brief. You don't need to tell me if you're going to call a function; just do it directly. Keep your words to a minimum. When you're delivering the forecast, you can use more words and personality.",
+            content,
           },
         ],
       },
       { name: "run_on_config", value: true },
-
-      // OpenAI
-
-      // {
-      //   name: "tools",
-      //   value: [
-      //     {
-      //       type: "function",
-      //       function: {
-      //         name: "get_current_weather",
-      //         description:
-      //           "Get the current weather for a location. This includes the conditions as well as the temperature.",
-      //         parameters: {
-      //           type: "object",
-      //           properties: {
-      //             location: {
-      //               type: "string",
-      //               description: "The city and state, e.g. San Francisco, CA",
-      //             },
-      //             format: {
-      //               type: "string",
-      //               enum: ["celsius", "fahrenheit"],
-      //               description:
-      //                 "The temperature unit to use. Infer this from the users location.",
-      //             },
-      //           },
-      //           required: ["location", "format"],
-      //         },
-      //       },
-      //     },
-      //   ],
-      // },
 
       // Anthropic
 
@@ -121,25 +99,21 @@ export const defaultConfig = [
         name: "tools",
         value: [
           {
-            name: "get_weather",
+            name: "get_vocabulary_word",
             description:
-              "Get the current weather for a location. This includes the conditions as well as the temperature.",
+              "Get the vocabulary word and image url for that vocabulary word.",
             input_schema: {
               type: "object",
               properties: {
-                location: {
+                word: {
                   type: "string",
-                  description:
-                    "The user's location in the form 'city,state,country'. For example, if the user is in Austin, TX, use 'austin,tx,us'.",
+                  description: "The vocabulary word.",
                 },
-                format: {
+                url: {
                   type: "string",
-                  enum: ["celsius", "fahrenheit"],
-                  description:
-                    "The temperature unit to use. Infer this from the user's location.",
+                  description: "The url for the image of the vocabulary word.",
                 },
               },
-              required: ["location", "format"],
             },
           },
         ],

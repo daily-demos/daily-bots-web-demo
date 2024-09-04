@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
+import Image from "next/image";
 import {
   FunctionCallParams,
   LLMHelper,
@@ -68,20 +69,43 @@ export const Session = React.memo(
       }, [hasStarted])
     );
 
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
     (voiceClient.getHelper("llm") as LLMHelper).handleFunctionCall(
       async (fn: FunctionCallParams) => {
-        console.log({ fn });
-        const args = fn.arguments as any;
-        if (fn.functionName === "get_weather" && args.location) {
-          const response = await fetch(
-            `/api/weather?location=${encodeURIComponent(args.location)}`
-          );
-          const json = await response.json();
-          console.log("weather:", json);
-          return json;
-        } else {
-          return { error: "couldn't fetch weather" };
-        }
+        console.log("Function: ", { fn });
+
+        type Word = {
+          word: string;
+          imageUrl: string;
+        };
+
+        const words: Word[] = [
+          {
+            word: "apple",
+            imageUrl:
+              "https://plus.unsplash.com/premium_photo-1668772704261-b11d89a92bad?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          },
+          {
+            word: "book",
+            imageUrl:
+              "https://plus.unsplash.com/premium_photo-1669652639337-c513cc42ead6?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          },
+          {
+            word: "car",
+            imageUrl:
+              "https://plus.unsplash.com/premium_photo-1664303847960-586318f59035?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          },
+        ];
+
+        // Get a random element from the words array
+        const randomWord = words[Math.floor(Math.random() * words.length)];
+
+        setImageUrl(randomWord.imageUrl);
+
+        return {
+          word: randomWord.word,
+        };
       }
     );
 
@@ -154,7 +178,7 @@ export const Session = React.memo(
           )}
 
         <div className="flex-1 flex flex-col items-center justify-center w-full">
-          <Card.Card
+          {/* <Card.Card
             fullWidthMobile={false}
             className="w-full max-w-[320px] sm:max-w-[420px] mt-auto shadow-long"
           >
@@ -162,6 +186,15 @@ export const Session = React.memo(
               isReady={state === "ready"}
               statsAggregator={stats_aggregator}
             />
+          </Card.Card> */}
+          <Card.Card
+            fullWidthMobile={false}
+            className="w-full max-w-[320px] sm:max-w-[420px] mt-auto shadow-long"
+          >
+            {imageUrl && (
+              // <Image src={imageUrl} alt="apple" width={320} height={320} />
+              <img src={imageUrl} alt="apple" />
+            )}
           </Card.Card>
           <UserMicBubble
             active={hasStarted}
