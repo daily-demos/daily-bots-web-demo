@@ -1,5 +1,5 @@
 [![Try](https://img.shields.io/badge/try_it-here-blue)](https://demo.dailybots.ai)
-[![Deploy](https://img.shields.io/badge/Deploy_to_Vercel-black?style=flat&logo=Vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdaily-demos%2Fdaily-bots-web-demo&env=DAILY_BOTS_DAILY_API_KEY,DAILY_BOTS_URL,NEXT_PUBLIC_BASE_URL&project-name=daily-bots-demo&repository-name=daily-bots-web-demo)
+[![Deploy](https://img.shields.io/badge/Deploy_to_Vercel-black?style=flat&logo=Vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdaily-demos%2Fdaily-bots-web-demo&env=DAILY_API_KEY,DAILY_BOTS_URL,NEXT_PUBLIC_BASE_URL&project-name=daily-bots-demo&repository-name=daily-bots-web-demo)
 
 
 <img src="public/icon.png" width="120px">
@@ -17,7 +17,7 @@ Example NextJS app that demonstrates core capabilities of [Daily Bots](https://b
 cp env.example .env.local
 ```
 
-`DAILY_BOTS_DAILY_API_KEY`: Your Daily API key obtained by registering at https://bots.daily.co.
+`DAILY_API_KEY`: Your Daily API key obtained by registering at https://bots.daily.co.
 
 `DAILY_BOTS_URL`: URL of the Daily Bots `start` endpoint. Default: https://api.daily.co/v1/bots/start.
 
