@@ -18,7 +18,7 @@ import {
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
-  const [fetchingWeather, setFetchingWeather] = useState(false);
+  const [fetchingRAG, setFetchingRAG] = useState(false);
   const voiceClientRef = useRef<DailyVoiceClient | null>(null);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function Home() {
     const llmHelper = new LLMHelper({
       callbacks: {
         onLLMFunctionCall: (fn) => {
-          setFetchingWeather(true);
+          setFetchingRAG(true);
         },
       },
     });
@@ -44,16 +44,52 @@ export default function Home() {
 
     llmHelper.handleFunctionCall(async (fn: FunctionCallParams) => {
       const args = fn.arguments as any;
-      if (fn.functionName === "get_weather" && args.location) {
-        const response = await fetch(
-          `/api/weather?location=${encodeURIComponent(args.location)}`
-        );
-        const json = await response.json();
-        setFetchingWeather(false);
-        return json;
-      } else {
-        setFetchingWeather(false);
-        return { error: "couldn't fetch weather" };
+      try {
+        if (fn.functionName === "get_rag_context" && args.query) {
+          console.log("get_rag_context", args.query);
+          const response = await fetch("/api/rag", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query: args.query }),
+          });
+
+          if (!response.ok) {
+            setFetchingRAG(false);
+            throw new Error("Failed to fetch RAG context");
+          }
+
+          const data = await response.json();
+          setFetchingRAG(false);
+
+          console.log(data);
+
+          // Assuming the API returns both ragResults and llmResponse
+          // We'll return a formatted context that includes both
+          const formattedContext = `
+            Relevant Context:
+            ${data.ragResults
+              .map(
+                (result: any) =>
+                  `Title: ${result.metadata.title}
+               Content: ${result.metadata.truncated_content}`
+              )
+              .join("\n\n")}
+  
+            AI Response:
+            ${data.llmResponse}
+          `;
+
+          return { context: formattedContext };
+        } else {
+          setFetchingRAG(false);
+          return { error: "Invalid function call or missing query" };
+        }
+      } catch (error) {
+        console.error("Error fetching RAG context:", error);
+        setFetchingRAG(false);
+        return { error: "Couldn't fetch RAG context" };
       }
     });
 
@@ -71,7 +107,7 @@ export default function Home() {
           <main>
             <Header />
             <div id="app">
-              <App fetchingWeather={fetchingWeather} />
+              <App fetchingRAG={fetchingRAG} />
             </div>
           </main>
           <aside id="tray" />

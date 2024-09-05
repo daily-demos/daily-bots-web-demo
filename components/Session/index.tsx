@@ -21,14 +21,14 @@ interface SessionProps {
   onLeave: () => void;
   openMic?: boolean;
   startAudioOff?: boolean;
-  fetchingWeather: boolean;
+  fetchingRAG: boolean;
 }
 
 export const Session = ({
   state,
   onLeave,
   startAudioOff = false,
-  fetchingWeather = false,
+  fetchingRAG = false,
 }: SessionProps) => {
   const voiceClient = useVoiceClient()!;
   const [hasStarted, setHasStarted] = useState<boolean>(false);
@@ -131,7 +131,7 @@ export const Session = ({
         >
           <Agent
             isReady={state === "ready"}
-            fetchingWeather={fetchingWeather}
+            fetchingRAG={fetchingRAG}
             statsAggregator={stats_aggregator}
           />
         </Card.Card>

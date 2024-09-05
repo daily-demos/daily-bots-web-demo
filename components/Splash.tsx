@@ -12,15 +12,20 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
     <main className="w-full flex items-center justify-center bg-primary-200 p-4 bg-[length:auto_50%] lg:bg-auto bg-colorWash bg-no-repeat bg-right-top">
       <div className="flex flex-col gap-8 lg:gap-12 items-center max-w-full lg:max-w-3xl">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-balance text-left">
-          Daily Bots function calling demo
+          Daily Bots RAG demo
         </h1>
 
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          Function calling with Claude 3.5 Sonnet
+          RAG via function calling with OpenAI gpt-4o
         </p>
-        <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          “ Ask me about the weather ”
-        </p>
+        <div className="flex flex-col gap-2">
+          <p className="text-primary-500 text-xl font-semibold leading-relaxed">
+            “ Hi, I’m Ben Thompson, from Stratechery.
+          </p>
+          <p className="text-primary-500 text-xl font-semibold leading-relaxed">
+            Ask me anything about tech, business, or media. ”
+          </p>
+        </div>
 
         <Button onClick={() => handleReady()}>Try Demo</Button>
 
