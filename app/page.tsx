@@ -47,6 +47,8 @@ export default function Home() {
       try {
         if (fn.functionName === "get_rag_context" && args.query) {
           console.log("get_rag_context", args.query);
+          setFetchingRAG(true);
+
           const response = await fetch("/api/rag", {
             method: "POST",
             headers: {
@@ -65,18 +67,17 @@ export default function Home() {
 
           console.log(data);
 
-          // Assuming the API returns both ragResults and llmResponse
-          // We'll return a formatted context that includes both
           const formattedContext = `
-            Relevant Context:
+            Relevant Context (${data.level} level):
             ${data.ragResults
               .map(
                 (result: any) =>
                   `Title: ${result.metadata.title}
+               Level: ${result.metadata.level}
                Content: ${result.metadata.truncated_content}`
               )
               .join("\n\n")}
-  
+    
             AI Response:
             ${data.llmResponse}
           `;

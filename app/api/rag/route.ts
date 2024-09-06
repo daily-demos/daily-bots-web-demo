@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { generateResponse, query_similar_content } from "@/utils/rag_query";
+import { hierarchicalRetrieval } from "@/utils/rag_query";
 
 export async function POST(request: Request) {
   const { query } = await request.json();
 
   try {
-    const ragResults = await query_similar_content(query);
-    const llmResponse = await generateResponse(query, ragResults);
-    return NextResponse.json({ ragResults, llmResponse });
+    const { response, ragResults, level } = await hierarchicalRetrieval(query);
+    return NextResponse.json({ ragResults, llmResponse: response, level });
   } catch (error) {
     console.error("RAG query error:", error);
     return NextResponse.json(
