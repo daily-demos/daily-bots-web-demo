@@ -5,6 +5,19 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { ChatOpenAI } from "@langchain/openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 
+// Define types for our metadata and results
+type ChunkMetadata = {
+  title: string;
+  content: string;
+  file_name: string;
+  chunk_index: number;
+};
+
+type QueryResult = {
+  score: number;
+  metadata: ChunkMetadata;
+};
+
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
   modelName: "text-embedding-3-small",
@@ -15,58 +28,71 @@ const pinecone = new Pinecone({
 });
 
 const chatModel = new ChatOpenAI({
-  modelName: "gpt-4o",
+  modelName: "gpt-4o-mini",
   openAIApiKey: process.env.OPENAI_API_KEY,
 });
 
-async function query_similar_content(
+export async function query_similar_content(
   query: string,
-  top_k: number = 3,
-  level: string = "summary"
-) {
-  console.log(`Querying for ${level} content with query: "${query}"`);
+  top_k: number = 5
+): Promise<QueryResult[]> {
+  console.time("query_similar_content");
   try {
     const index = pinecone.Index("stratechery-articles");
+
+    // Generate embedding for the query
     const queryEmbedding = await embeddings.embedQuery(query);
 
+    // Query Pinecone
     const queryResponse = await index.query({
       vector: queryEmbedding,
       topK: top_k,
       includeMetadata: true,
-      filter: { level: level },
     });
 
-    console.log(
-      `Retrieved ${queryResponse.matches?.length || 0} ${level} results`
-    );
-    return (
+    console.timeEnd("query_similar_content");
+
+    // Format and log the results
+    const results: QueryResult[] =
       queryResponse.matches?.map((match) => ({
-        score: match.score,
+        score: match.score || 0,
         metadata: {
-          title: match.metadata?.title ?? "Untitled",
-          truncated_content: match.metadata?.truncated_content ?? "",
-          file_name: match.metadata?.file_name ?? "",
-          level: match.metadata?.level ?? "",
+          title: (match.metadata?.title as string) || "Untitled",
+          content: (match.metadata?.content as string) || "",
+          file_name: (match.metadata?.file_name as string) || "",
+          chunk_index: (match.metadata?.chunk_index as number) || 0,
         },
-      })) ?? []
-    );
+      })) ?? [];
+
+    console.log(`RAG Results for query: "${query}"`);
+    results.forEach((result, index) => {
+      console.log(`\nResult ${index + 1}:`);
+      console.log(`Score: ${result.score}`);
+      console.log(`Title: ${result.metadata.title}`);
+      console.log(`File: ${result.metadata.file_name}`);
+      console.log(`Chunk Index: ${result.metadata.chunk_index}`);
+      console.log(
+        `Content Preview: ${result.metadata.content.substring(0, 100)}...`
+      );
+    });
+
+    return results;
   } catch (error) {
-    console.error(`Error in query_similar_content for ${level}:`, error);
-    throw new Error(`Failed to query similar content for ${level}`);
+    console.error("Error in query_similar_content:", error);
+    throw new Error("Failed to query similar content");
   }
 }
 
-async function generateResponse(
+export async function generateResponse(
   query: string,
-  ragResults: any[],
-  detailLevel: string
+  ragResults: QueryResult[]
 ) {
-  console.log(`Generating response for ${detailLevel} level`);
+  console.time("generateResponse");
   try {
     const context = ragResults
       .map(
         (result) =>
-          `Title: ${result.metadata.title}\nLevel: ${result.metadata.level}\nContent: ${result.metadata.truncated_content}`
+          `Title: ${result.metadata.title}\nContent: ${result.metadata.content}`
       )
       .join("\n\n");
 
@@ -77,13 +103,6 @@ async function generateResponse(
       {context}
 
       Question: {query}
-
-      Detail Level: ${detailLevel}
-      ${
-        detailLevel !== "summary"
-          ? "Please provide a more detailed answer based on the expanded context."
-          : ""
-      }
 
       Answer:
     `);
@@ -98,71 +117,33 @@ async function generateResponse(
       new StringOutputParser(),
     ]);
 
-    const response = await chain.invoke({
-      context,
-      query,
-    });
+    const response = await chain.invoke(
+      {
+        context,
+        query,
+      },
+      {
+        callbacks: [
+          {
+            handleLLMEnd: (output) => {
+              const usage = output.llmOutput?.tokenUsage;
+              console.log("Token Usage:", {
+                prompt_tokens: usage?.promptTokens || 0,
+                completion_tokens: usage?.completionTokens || 0,
+                total_tokens: usage?.totalTokens || 0,
+              });
+            },
+          },
+        ],
+      }
+    );
 
-    console.log(`Generated response for ${detailLevel} level`);
-    return response;
+    console.timeEnd("generateResponse");
+    console.log(`Generated response for query: "${query}"`);
+
+    return { response };
   } catch (error) {
-    console.error(`Error in generateResponse for ${detailLevel}:`, error);
-    throw new Error(`Failed to generate response for ${detailLevel}`);
+    console.error("Error in generateResponse:", error);
+    throw new Error("Failed to generate response");
   }
-}
-
-async function needMoreInformation(
-  query: string,
-  response: string
-): Promise<boolean> {
-  console.log("Checking if more information is needed");
-  const prompt = PromptTemplate.fromTemplate(`
-    Analyze the following question and response, and determine if more detailed information is needed:
-
-    Question: {query}
-    Response: {response}
-
-    Does this response fully answer the question, or is more detailed information required?
-    Answer with 'Yes' if more information is needed, or 'No' if the response is sufficient.
-
-    Answer:
-  `);
-
-  const chain = RunnableSequence.from([
-    {
-      query: (input: any) => input.query,
-      response: (input: any) => input.response,
-    },
-    prompt,
-    chatModel,
-    new StringOutputParser(),
-  ]);
-
-  const result = await chain.invoke({ query, response });
-  const needMore = result.toLowerCase().includes("yes");
-  console.log(`Need more information: ${needMore}`);
-  return needMore;
-}
-
-export async function hierarchicalRetrieval(query: string) {
-  console.log(`Starting hierarchical retrieval for query: "${query}"`);
-
-  // Step 1: Retrieve summaries (5 results)
-  const summaryResults = await query_similar_content(query, 5, "summary");
-  let response = await generateResponse(query, summaryResults, "summary");
-
-  // Step 2: Check if more information is needed
-  let needMore = await needMoreInformation(query, response);
-
-  if (needMore) {
-    console.log("Moving to full content level");
-    // Step 3: Retrieve full sections (3 results)
-    const fullResults = await query_similar_content(query, 3, "section");
-    response = await generateResponse(query, fullResults, "full");
-    console.log("Hierarchical retrieval complete at full level");
-    return { response, ragResults: fullResults, level: "full" };
-  }
-
-  console.log("Hierarchical retrieval complete at summary level");
-  return { response, ragResults: summaryResults, level: "summary" };
 }

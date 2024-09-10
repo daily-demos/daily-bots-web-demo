@@ -68,13 +68,12 @@ export default function Home() {
           console.log(data);
 
           const formattedContext = `
-            Relevant Context (${data.level} level):
+            Relevant Context:
             ${data.ragResults
               .map(
                 (result: any) =>
                   `Title: ${result.metadata.title}
-               Level: ${result.metadata.level}
-               Content: ${result.metadata.truncated_content}`
+                   Content: ${result.metadata.content}`
               )
               .join("\n\n")}
     
