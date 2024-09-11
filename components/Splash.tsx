@@ -16,7 +16,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
         </h1>
 
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          RAG via function calling with OpenAI gpt-4o
+          RAG via function calling with OpenAI gpt-4o-mini
         </p>
         <div className="flex flex-col gap-2">
           <p className="text-primary-500 text-xl font-semibold leading-relaxed">

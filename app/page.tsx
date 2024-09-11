@@ -19,7 +19,12 @@ import {
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [fetchingRAG, setFetchingRAG] = useState(false);
+  const [ragStats, setRagStats] = useState<any>(null);
   const voiceClientRef = useRef<DailyVoiceClient | null>(null);
+
+  const updateRAGStats = (stats: any) => {
+    setRagStats(stats);
+  };
 
   useEffect(() => {
     if (!showSplash || voiceClientRef.current) {
@@ -65,7 +70,9 @@ export default function Home() {
           const data = await response.json();
           setFetchingRAG(false);
 
-          console.log(data);
+          const { ragStats } = data;
+
+          updateRAGStats(ragStats);
 
           const formattedContext = `
             Relevant Context:
@@ -107,7 +114,7 @@ export default function Home() {
           <main>
             <Header />
             <div id="app">
-              <App fetchingRAG={fetchingRAG} />
+              <App fetchingRAG={fetchingRAG} ragStats={ragStats} />
             </div>
           </main>
           <aside id="tray" />

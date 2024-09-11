@@ -27,7 +27,7 @@ export const defaultConfig = [
   {
     service: "llm",
     options: [
-      { name: "model", value: "gpt-4o" },
+      { name: "model", value: "gpt-4o-mini" },
       {
         name: "initial_messages",
         value: [
