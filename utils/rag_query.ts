@@ -64,6 +64,7 @@ export async function query_similar_content(
         },
       })) ?? [];
 
+    // Log the results for inspection
     console.log(`RAG Results for query: "${query}"`);
     results.forEach((result, index) => {
       console.log(`\nResult ${index + 1}:`);
@@ -97,15 +98,15 @@ export async function generateResponse(
       .join("\n\n");
 
     const prompt = PromptTemplate.fromTemplate(`
-      You are a helpful assistant that answers questions based on the provided context. If the context doesn't contain relevant information, say so.
+        You are a helpful assistant that answers questions based on the provided context. If the context doesn't contain relevant information, say so.
 
-      Context:
-      {context}
+        Context:
+        {context}
 
-      Question: {query}
+        Question: {query}
 
-      Answer:
-    `);
+        Answer:
+      `);
 
     const chain = RunnableSequence.from([
       {
@@ -117,6 +118,12 @@ export async function generateResponse(
       new StringOutputParser(),
     ]);
 
+    let tokenUsage = {
+      promptTokens: 0,
+      completionTokens: 0,
+      totalTokens: 0,
+    };
+
     const response = await chain.invoke(
       {
         context,
@@ -127,11 +134,12 @@ export async function generateResponse(
           {
             handleLLMEnd: (output) => {
               const usage = output.llmOutput?.tokenUsage;
-              console.log("Token Usage:", {
-                prompt_tokens: usage?.promptTokens || 0,
-                completion_tokens: usage?.completionTokens || 0,
-                total_tokens: usage?.totalTokens || 0,
-              });
+              tokenUsage = {
+                promptTokens: usage?.promptTokens || 0,
+                completionTokens: usage?.completionTokens || 0,
+                totalTokens: usage?.totalTokens || 0,
+              };
+              console.log("Token Usage:", tokenUsage);
             },
           },
         ],
@@ -141,7 +149,7 @@ export async function generateResponse(
     console.timeEnd("generateResponse");
     console.log(`Generated response for query: "${query}"`);
 
-    return { response };
+    return { response, tokenUsage };
   } catch (error) {
     console.error("Error in generateResponse:", error);
     throw new Error("Failed to generate response");

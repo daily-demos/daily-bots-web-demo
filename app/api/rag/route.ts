@@ -14,7 +14,10 @@ export async function POST(request: Request) {
       performance.now() - querySimilarContentStartTime;
 
     const generateResponseStartTime = performance.now();
-    const llmResponse = await generateResponse(query, ragResults);
+    const { response: llmResponse, tokenUsage } = await generateResponse(
+      query,
+      ragResults
+    );
     const generateResponseTime = performance.now() - generateResponseStartTime;
 
     const totalRAGTime = performance.now() - startTime;
@@ -50,6 +53,7 @@ export async function POST(request: Request) {
       generateResponseTime,
       totalRAGTime,
       links,
+      tokenUsage,
     };
 
     return NextResponse.json({ ragResults, llmResponse, ragStats });

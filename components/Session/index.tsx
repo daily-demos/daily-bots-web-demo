@@ -175,7 +175,6 @@ export const Session = ({
         createPortal(
           <RAGStatsDrawer
             ragStats={ragStats}
-            ragStatsHistory={ragStatsHistory}
             handleClose={() => setShowRAGStats(false)}
           />,
           document.getElementById("tray")!
