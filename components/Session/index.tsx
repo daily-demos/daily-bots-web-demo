@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
-import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
+import { LineChart, LogOut, Settings, StopCircle, Camera } from "lucide-react";
+import { PipecatMetrics, TransportState, VoiceEvent, LLMHelper } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
@@ -31,6 +31,56 @@ export const Session = React.memo(
     const [showStats, setShowStats] = useState<boolean>(false);
     const [muted, setMuted] = useState(startAudioOff);
     const modalRef = useRef<HTMLDialogElement>(null);
+    const inputFileRef = React.useRef<HTMLInputElement | null>(null);
+
+
+    const handleCameraClick = () => {
+      if (!inputFileRef.current) return;
+        inputFileRef.current?.click();
+    }
+
+    const handleImgChange =
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files) return;
+        const reader = new FileReader();
+        reader.addEventListener("load", async () => {
+          const dataUrl = reader.result as string;
+          const base64start = dataUrl.indexOf('base64,');
+          const base64Data = dataUrl.substring(base64start + 'base64,'.length);
+
+          const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
+
+          const msg = {
+            content: [
+              {
+                source: {
+                  data: base64Data,
+                  //e.g. data:image/png;base64,
+                  media_type: dataUrl.substring(5,base64start-1),
+                  type: 'base64',
+                },
+                type: 'image'
+              },
+              {
+                text: "Here is an image",
+                type: 'text'
+              }
+            ],
+            role: 'user'
+          };
+
+          //@ts-ignore
+          await llmHelper.appendToMessages(msg, true);
+        }, false);
+
+        if(event.target.files[0].size > 5*1024*1024*3/4) {
+          alert(`Image exceeds maximum size of ${5*1024*1024*3/4} bytes.`);
+          return;
+        }
+        else {
+          reader.readAsDataURL(event.target.files[0]);
+        }
+      };
 
     // ---- Voice Client Events
 
@@ -138,6 +188,27 @@ export const Session = React.memo(
 
         <footer className="w-full flex flex-row mt-auto self-end md:w-auto">
           <div className="flex flex-row justify-between gap-3 w-full md:w-auto">
+            <input
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={handleImgChange}
+                  accept="image/x-png,image/jpg,image/jpeg"
+                  ref={inputFileRef}
+                />
+
+            <Tooltip>
+              <TooltipContent>Get Image</TooltipContent>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCameraClick}
+                >
+                  <Camera />
+                </Button>
+              </TooltipTrigger>
+            </Tooltip>
+
             <Tooltip>
               <TooltipContent>Interrupt bot</TooltipContent>
               <TooltipTrigger asChild>
