@@ -12,14 +12,14 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
     <main className="w-full flex items-center justify-center bg-primary-200 p-4 bg-[length:auto_50%] lg:bg-auto bg-colorWash bg-no-repeat bg-right-top">
       <div className="flex flex-col gap-8 lg:gap-12 items-center max-w-full lg:max-w-3xl">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-balance text-left">
-          Daily Bots vision demo
+          Daily Bots Scavenger Hunt Game
         </h1>
 
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
           Claude 3.5 Sonnet
         </p>
 
-        <Button onClick={() => handleReady()}>Try Demo</Button>
+        <Button onClick={() => handleReady()}>Play the Game</Button>
 
         <div className="h-[1px] bg-primary-300 w-full" />
 
@@ -36,7 +36,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
           <Button variant="light" asChild>
             <a
-              href="https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch"
+              href="https://github.com/daily-demos/daily-bots-web-demo/tree/lewis/scavenger-hunt-game"
               className="text-indigo-600"
             >
               <Book className="size-6" />
