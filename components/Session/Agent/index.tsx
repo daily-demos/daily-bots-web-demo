@@ -69,12 +69,7 @@ export const Agent: React.FC<{
             </span>
           ) : (
             <>
-              {fetchingRAG && (
-                <span className={styles.functionCalling}>
-                  <Loader2 size={32} className="animate-spin" />
-                </span>
-              )}
-              <WaveForm />
+              <WaveForm isThinking={fetchingRAG} scanningSpeed={1} />
             </>
           )}
         </div>
