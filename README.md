@@ -12,7 +12,7 @@ Example NextJS app that demonstrates core capabilities of [Daily Bots](https://b
 ## Other demos
 
 - [Vision](https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch) - Anthropic, describe webcam.
-- [Function calling](https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-call) - Anthropic, function calling (get current weather)
+- [Function calling](https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-calling) - Anthropic, function calling (get current weather)
 
 ## Getting started
 
