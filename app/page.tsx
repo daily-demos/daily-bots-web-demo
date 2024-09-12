@@ -12,8 +12,8 @@ import Header from "@/components/Header";
 import Splash from "@/components/Splash";
 import {
   BOT_READY_TIMEOUT,
-  defaultConfig,
   defaultServices,
+  getDefaultConfig,
 } from "@/rtvi.config";
 
 export default function Home() {
@@ -31,10 +31,19 @@ export default function Home() {
       return;
     }
 
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    // Get the config with the current date
+    const config = getDefaultConfig(currentDate);
+
     const voiceClient = new DailyVoiceClient({
       baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "/api",
       services: defaultServices,
-      config: defaultConfig,
+      config: config,
       timeout: BOT_READY_TIMEOUT,
     });
 
