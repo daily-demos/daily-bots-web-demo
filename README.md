@@ -14,7 +14,7 @@ This game is a modified version of the - [Vision](https://github.com/daily-demos
 In addition to the exciting game play (which comes simply from modifying the system prompt), this demo illustates:
 
 - Adding image files directly to the LLM context.
-- Anthropic's (beta) [prompt caching feature](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching). Because the game adds several image files to the LLM context, the context can grow quite large. Prompt caching reduces the fees for Anthropic usage by about 80% in a typical game.
+- Anthropic's (beta) [prompt caching feature](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching). Because the game adds several image files to the LLM context, the context can grow quite large. Prompt caching reduces the fees for Anthropic usage by over 60% in a typical game.
 
 ## Other demos
 
