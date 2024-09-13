@@ -16,14 +16,16 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
         </h1>
 
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          RAG via function calling with OpenAI gpt-4o-mini
+          RAG-enhanced low-latency conversational AI with: <br />
+          Langchain <br />
+          Pinecone <br />
+          OpenAI text-embedding-3-small <br />
+          OpenAI gpt-4o-mini
         </p>
+
         <div className="flex flex-col gap-2">
           <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-            “ Hi, I’m Ben Thompson, from Stratechery.
-          </p>
-          <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-            Ask me anything about tech, business, or media. ”
+            “Hi, I’m Ben Thompson, author and founder of Stratechery.”
           </p>
         </div>
 
