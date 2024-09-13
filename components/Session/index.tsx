@@ -57,6 +57,10 @@ export const Session = ({
   });
   const [muted, setMuted] = useState(startAudioOff);
   const modalRef = useRef<HTMLDialogElement>(null);
+  const [cumulativeTokens, setCumulativeTokens] = useState({
+    input: 0,
+    output: 0,
+  });
 
   // ---- Voice Client Events
 
@@ -137,13 +141,18 @@ export const Session = ({
         ].slice(-20),
         totalTimes: [...prev.totalTimes, ragStats.totalRAGTime].slice(-20),
       }));
+
+      setCumulativeTokens((prev) => ({
+        input: prev.input + ragStats.tokenUsage.promptTokens,
+        output: prev.output + ragStats.tokenUsage.completionTokens,
+      }));
     }
   }, [ragStats]);
 
-  function toggleMute() {
+  const toggleMute = useCallback(() => {
     voiceClient.enableMic(muted);
-    setMuted(!muted);
-  }
+    setMuted((prev) => !prev);
+  }, [voiceClient, muted]);
 
   return (
     <>
@@ -175,6 +184,7 @@ export const Session = ({
         createPortal(
           <RAGStatsDrawer
             ragStats={ragStats}
+            cumulativeTokens={cumulativeTokens}
             handleClose={() => setShowRAGStats(false)}
           />,
           document.getElementById("tray")!
@@ -238,7 +248,7 @@ export const Session = ({
               <Button
                 variant={showRAGStats ? "light" : "ghost"}
                 size="icon"
-                onClick={() => setShowRAGStats(!showRAGStats)}
+                onClick={() => setShowRAGStats((prev) => !prev)}
               >
                 <FileText />
               </Button>

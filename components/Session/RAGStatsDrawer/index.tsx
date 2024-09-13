@@ -16,18 +16,21 @@ interface RAGStatsDrawerProps {
       totalTokens: number;
     };
   };
+  cumulativeTokens: {
+    input: number;
+    output: number;
+  };
   handleClose: () => void;
 }
 
 const RAGStatsDrawer: React.FC<RAGStatsDrawerProps> = ({
   ragStats,
+  cumulativeTokens,
   handleClose,
 }) => {
   const [queryTimes, setQueryTimes] = useState<number[]>([]);
   const [responseTimes, setResponseTimes] = useState<number[]>([]);
   const [totalTimes, setTotalTimes] = useState<number[]>([]);
-  const [totalInputTokens, setTotalInputTokens] = useState(0);
-  const [totalOutputTokens, setTotalOutputTokens] = useState(0);
 
   useEffect(() => {
     const msToSec = (ms: number) => ms / 1000;
@@ -40,9 +43,6 @@ const RAGStatsDrawer: React.FC<RAGStatsDrawerProps> = ({
     setTotalTimes((prev) =>
       [...prev, msToSec(ragStats.totalRAGTime)].slice(-20)
     );
-
-    setTotalInputTokens((prev) => prev + ragStats.tokenUsage.promptTokens);
-    setTotalOutputTokens((prev) => prev + ragStats.tokenUsage.completionTokens);
   }, [ragStats]);
 
   return (
@@ -76,11 +76,11 @@ const RAGStatsDrawer: React.FC<RAGStatsDrawerProps> = ({
           <TokenUsageTile
             inputTokens={{
               latest: ragStats.tokenUsage.promptTokens,
-              total: totalInputTokens,
+              total: cumulativeTokens.input,
             }}
             outputTokens={{
               latest: ragStats.tokenUsage.completionTokens,
-              total: totalOutputTokens,
+              total: cumulativeTokens.output,
             }}
           />
           <div>
