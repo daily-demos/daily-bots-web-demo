@@ -57,8 +57,10 @@ export const LANGUAGES = [
 ];
 
 export const defaultServices = {
-  llm: "together",
+  // llm: "together",
+  llm: "openai",
   tts: "cartesia",
+  // tts: "elevenlabs",
   stt: "deepgram",
 };
 
@@ -67,29 +69,59 @@ Keep responses brief and legible.
 Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.
 Start by briefly introducing yourself.`;
 
+export const OpenaiFunctionCallLLMPrompt = `
+You are a assistant called ExampleBot. Users can ask you anything.
+Keep responses brief.
+Use the supplied tools to assist the user.
+Your responses will converted to audio. Please do not include any special characters in your response other than '!' or '?'.
+`
+
+export const OpenaiTools = [
+  {
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "Get the current weather in a given location",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "The city and state, e.g. San Francisco, CA",
+          }
+        },
+        "required": ["location"],
+        additionalProperties: false,
+      },
+    },
+  }
+];
+
 export const defaultConfig = [
   { service: "vad", options: [{ name: "params", value: { stop_secs: 0.3 } }] },
-  {
-    service: "tts",
-    options: [
-      { name: "voice", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
-      { name: "model", value: LANGUAGES[0].tts_model },
-      { name: "language", value: LANGUAGES[0].value },
-    ],
-  },
+  // {
+  //   service: "tts",
+  //   options: [
+  //     { name: "voice", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
+  //     { name: "model", value: LANGUAGES[0].tts_model },
+  //     { name: "language", value: LANGUAGES[0].value },
+  //   ],
+  // },
   {
     service: "llm",
     options: [
-      { name: "model", value: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
+      // { name: "model", value: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
       {
         name: "initial_messages",
         value: [
           {
             role: "system",
-            content: defaultLLMPrompt,
+            content: OpenaiFunctionCallLLMPrompt,
           },
+          { role: "user", content: `Say "hello."` },
         ],
       },
+      { name: "tools", value: OpenaiTools },
       { name: "run_on_config", value: true },
     ],
   },

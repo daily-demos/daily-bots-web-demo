@@ -10,14 +10,43 @@ export async function POST(request: Request) {
     });
   }
 
+  const webhooks = [
+    {
+      url: "http://localhost:3000/api/get_weather",
+      method: "POST",
+      headers: {"Authorization": "Bearer ABCDEF"},
+      events: [
+        { event_name: "pre_llm" },
+        { event_name: "post_llm" },
+        { 
+          event_name: "function_call",
+          await_return: true        
+        }
+      ],
+    },
+    {
+      url: "http://localhost:3000/api/webhook_events",
+      method: "POST",
+      headers: {"Authorization": "Bearer ABCDEF"},
+      events: [
+        { event_name: "pre_llm" },
+        { event_name: "post_llm" },
+      ],
+    },
+  ]
+  
+
   const payload = {
     bot_profile: defaultBotProfile,
     max_duration: defaultMaxDuration,
     services,
     api_keys: {
       openai: process.env.OPENAI_API_KEY,
+      elevenlabs: process.env.ELEVENLABS_API_KEY,
+      what: "something"
     },
     config: [...config],
+    webhooks,
   };
 
   const req = await fetch(process.env.DAILY_BOTS_URL, {
