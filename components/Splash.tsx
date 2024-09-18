@@ -37,6 +37,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           <Button variant="light" asChild>
             <a
               href="https://www.daily.co/products/daily-bots/"
+              target="_blank"
               className="text-indigo-600"
             >
               <Info className="size-6" />
@@ -46,7 +47,8 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
           <Button variant="light" asChild>
             <a
-              href="https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-calling"
+              href="https://github.com/daily-demos/daily-bots-web-demo/tree/mb/rag-function-calling"
+              target="_blank"
               className="text-indigo-600"
             >
               <Book className="size-6" />
