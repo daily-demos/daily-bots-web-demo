@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@langchain/core": "^0.2.31",
+    "@langchain/openai": "^0.2.10",
+    "@pinecone-database/pinecone": "^3.0.2",
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.7.0",

@@ -12,15 +12,22 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
     <main className="w-full flex items-center justify-center bg-primary-200 p-4 bg-[length:auto_50%] lg:bg-auto bg-colorWash bg-no-repeat bg-right-top">
       <div className="flex flex-col gap-8 lg:gap-12 items-center max-w-full lg:max-w-3xl">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-balance text-left">
-          Daily Bots function calling demo
+          Daily Bots RAG demo
         </h1>
 
         <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          Function calling with Claude 3.5 Sonnet
+          RAG-enhanced low-latency conversational AI with: <br />
+          Langchain <br />
+          Pinecone <br />
+          OpenAI text-embedding-3-small <br />
+          OpenAI gpt-4o-mini
         </p>
-        <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          “ Ask me about the weather ”
-        </p>
+
+        <div className="flex flex-col gap-2">
+          <p className="text-primary-500 text-xl font-semibold leading-relaxed">
+            “Hi, I’m Ben Thompson, author and founder of Stratechery.”
+          </p>
+        </div>
 
         <Button onClick={() => handleReady()}>Try Demo</Button>
 
@@ -30,6 +37,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           <Button variant="light" asChild>
             <a
               href="https://www.daily.co/products/daily-bots/"
+              target="_blank"
               className="text-indigo-600"
             >
               <Info className="size-6" />
@@ -39,7 +47,8 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
 
           <Button variant="light" asChild>
             <a
-              href="https://github.com/daily-demos/daily-bots-web-demo/tree/cb/function-calling"
+              href="https://github.com/daily-demos/daily-bots-web-demo/tree/mb/rag-function-calling"
+              target="_blank"
               className="text-indigo-600"
             >
               <Book className="size-6" />

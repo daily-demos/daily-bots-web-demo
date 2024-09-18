@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LineChart, LogOut, Settings, StopCircle } from "lucide-react";
+import {
+  FileText,
+  LineChart,
+  LogOut,
+  Settings,
+  StopCircle,
+} from "lucide-react";
 import { PipecatMetrics, TransportState, VoiceEvent } from "realtime-ai";
 import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
 
@@ -11,6 +17,7 @@ import * as Card from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 import Agent from "./Agent";
+import RAGStatsDrawer from "./RAGStatsDrawer";
 import Stats from "./Stats";
 import UserMicBubble from "./UserMicBubble";
 
@@ -21,21 +28,39 @@ interface SessionProps {
   onLeave: () => void;
   openMic?: boolean;
   startAudioOff?: boolean;
-  fetchingWeather: boolean;
+  fetchingRAG: boolean;
+  ragStats?: any;
+}
+
+interface RAGStatsHistory {
+  queryTimes: number[];
+  responseTimes: number[];
+  totalTimes: number[];
 }
 
 export const Session = ({
   state,
   onLeave,
   startAudioOff = false,
-  fetchingWeather = false,
+  fetchingRAG = false,
+  ragStats,
 }: SessionProps) => {
   const voiceClient = useVoiceClient()!;
   const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [showDevices, setShowDevices] = useState<boolean>(false);
   const [showStats, setShowStats] = useState<boolean>(false);
+  const [showRAGStats, setShowRAGStats] = useState<boolean>(false);
+  const [ragStatsHistory, setRagStatsHistory] = useState<RAGStatsHistory>({
+    queryTimes: [],
+    responseTimes: [],
+    totalTimes: [],
+  });
   const [muted, setMuted] = useState(startAudioOff);
   const modalRef = useRef<HTMLDialogElement>(null);
+  const [cumulativeTokens, setCumulativeTokens] = useState({
+    input: 0,
+    output: 0,
+  });
 
   // ---- Voice Client Events
 
@@ -94,10 +119,40 @@ export const Session = ({
     return () => current?.close();
   }, [showDevices]);
 
-  function toggleMute() {
+  // Open drawer when first RAG stats are received
+  useEffect(() => {
+    if (ragStats && !showRAGStats) {
+      setShowRAGStats(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ragStats]);
+
+  // Update RAG stats history when new stats are received
+  useEffect(() => {
+    if (ragStats) {
+      setRagStatsHistory((prev) => ({
+        queryTimes: [
+          ...prev.queryTimes,
+          ragStats.querySimilarContentTime,
+        ].slice(-20),
+        responseTimes: [
+          ...prev.responseTimes,
+          ragStats.generateResponseTime,
+        ].slice(-20),
+        totalTimes: [...prev.totalTimes, ragStats.totalRAGTime].slice(-20),
+      }));
+
+      setCumulativeTokens((prev) => ({
+        input: prev.input + ragStats.tokenUsage.promptTokens,
+        output: prev.output + ragStats.tokenUsage.completionTokens,
+      }));
+    }
+  }, [ragStats]);
+
+  const toggleMute = useCallback(() => {
     voiceClient.enableMic(muted);
-    setMuted(!muted);
-  }
+    setMuted((prev) => !prev);
+  }, [voiceClient, muted]);
 
   return (
     <>
@@ -124,6 +179,17 @@ export const Session = ({
           document.getElementById("tray")!
         )}
 
+      {showRAGStats &&
+        ragStats &&
+        createPortal(
+          <RAGStatsDrawer
+            ragStats={ragStats}
+            cumulativeTokens={cumulativeTokens}
+            handleClose={() => setShowRAGStats(false)}
+          />,
+          document.getElementById("tray")!
+        )}
+
       <div className="flex-1 flex flex-col items-center justify-center w-full">
         <Card.Card
           fullWidthMobile={false}
@@ -131,7 +197,7 @@ export const Session = ({
         >
           <Agent
             isReady={state === "ready"}
-            fetchingWeather={fetchingWeather}
+            fetchingRAG={fetchingRAG}
             statsAggregator={stats_aggregator}
           />
         </Card.Card>
@@ -175,6 +241,20 @@ export const Session = ({
               </Button>
             </TooltipTrigger>
           </Tooltip>
+
+          <Tooltip>
+            <TooltipContent>Show RAG statistics</TooltipContent>
+            <TooltipTrigger asChild>
+              <Button
+                variant={showRAGStats ? "light" : "ghost"}
+                size="icon"
+                onClick={() => setShowRAGStats((prev) => !prev)}
+              >
+                <FileText />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+
           <Tooltip>
             <TooltipContent>Configure</TooltipContent>
             <TooltipTrigger asChild>

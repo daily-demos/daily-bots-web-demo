@@ -12,31 +12,45 @@ import Header from "@/components/Header";
 import Splash from "@/components/Splash";
 import {
   BOT_READY_TIMEOUT,
-  defaultConfig,
   defaultServices,
+  getDefaultConfig,
 } from "@/rtvi.config";
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
-  const [fetchingWeather, setFetchingWeather] = useState(false);
+  const [fetchingRAG, setFetchingRAG] = useState(false);
+  const [ragStats, setRagStats] = useState<any>(null);
   const voiceClientRef = useRef<DailyVoiceClient | null>(null);
+
+  const updateRAGStats = (stats: any) => {
+    setRagStats(stats);
+  };
 
   useEffect(() => {
     if (!showSplash || voiceClientRef.current) {
       return;
     }
 
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    // Get the config with the current date
+    const config = getDefaultConfig(currentDate);
+
     const voiceClient = new DailyVoiceClient({
       baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "/api",
       services: defaultServices,
-      config: defaultConfig,
+      config: config,
       timeout: BOT_READY_TIMEOUT,
     });
 
     const llmHelper = new LLMHelper({
       callbacks: {
         onLLMFunctionCall: (fn) => {
-          setFetchingWeather(true);
+          setFetchingRAG(true);
         },
       },
     });
@@ -44,16 +58,54 @@ export default function Home() {
 
     llmHelper.handleFunctionCall(async (fn: FunctionCallParams) => {
       const args = fn.arguments as any;
-      if (fn.functionName === "get_weather" && args.location) {
-        const response = await fetch(
-          `/api/weather?location=${encodeURIComponent(args.location)}`
-        );
-        const json = await response.json();
-        setFetchingWeather(false);
-        return json;
-      } else {
-        setFetchingWeather(false);
-        return { error: "couldn't fetch weather" };
+      try {
+        if (fn.functionName === "get_rag_context" && args.query) {
+          console.log("get_rag_context", args.query);
+          setFetchingRAG(true);
+
+          const response = await fetch("/api/rag", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query: args.query }),
+          });
+
+          if (!response.ok) {
+            setFetchingRAG(false);
+            throw new Error("Failed to fetch RAG context");
+          }
+
+          const data = await response.json();
+          setFetchingRAG(false);
+
+          const { ragStats } = data;
+
+          updateRAGStats(ragStats);
+
+          const formattedContext = `
+            Relevant Context:
+            ${data.ragResults
+              .map(
+                (result: any) =>
+                  `Title: ${result.metadata.title}
+                   Content: ${result.metadata.content}`
+              )
+              .join("\n\n")}
+    
+            AI Response:
+            ${data.llmResponse}
+          `;
+
+          return { context: formattedContext };
+        } else {
+          setFetchingRAG(false);
+          return { error: "Invalid function call or missing query" };
+        }
+      } catch (error) {
+        console.error("Error fetching RAG context:", error);
+        setFetchingRAG(false);
+        return { error: "Couldn't fetch RAG context" };
       }
     });
 
@@ -71,7 +123,7 @@ export default function Home() {
           <main>
             <Header />
             <div id="app">
-              <App fetchingWeather={fetchingWeather} />
+              <App fetchingRAG={fetchingRAG} ragStats={ragStats} />
             </div>
           </main>
           <aside id="tray" />
