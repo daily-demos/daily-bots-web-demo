@@ -1,7 +1,5 @@
 import React, { createContext, ReactNode, useState } from "react";
 
-import { LANGUAGES } from "@/rtvi.config";
-
 interface AppContextType {
   character: number;
   setCharacter: (value: number) => void;

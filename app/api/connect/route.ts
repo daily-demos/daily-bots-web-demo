@@ -1,5 +1,5 @@
 // [POST] /api
-import { defaultBotProfile, defaultMaxDuration } from "./../../rtvi.config";
+import { defaultBotProfile, defaultMaxDuration } from "../../../rtvi.config";
 
 export async function POST(request: Request) {
   const { services, config } = await request.json();

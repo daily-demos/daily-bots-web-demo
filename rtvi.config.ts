@@ -68,7 +68,7 @@ Your responses will converted to audio. Please do not include any special charac
 Start by briefly introducing yourself.`;
 
 export const defaultConfig = [
-  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.3 } }] },
+  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.5 } }] },
   {
     service: "tts",
     options: [

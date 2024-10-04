@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { LLMContextMessage, LLMHelper, VoiceEvent } from "realtime-ai";
-import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
+import {
+  LLMContext,
+  LLMContextMessage,
+  LLMHelper,
+  RTVIEvent,
+} from "realtime-ai";
+import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
 
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
@@ -17,28 +22,16 @@ const Prompt: React.FC<PromptProps> = ({
   handleClose,
   characterPrompt,
 }) => {
-  const voiceClient = useVoiceClient()!;
+  const voiceClient = useRTVIClient()!;
   const [prompt, setPrompt] = useState<LLMContextMessage[] | undefined>(
     undefined
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  useEffect(() => {
-    (async function getPrompt() {
-      const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-      const p: LLMContextMessage[] = await llmHelper.getContext();
-
-      if (!p || !p.length) return;
-
-      setPrompt(p);
-    })();
-  }, [voiceClient]);
-
-  useVoiceClientEvent(VoiceEvent.ConfigUpdated, async () => {
+  useRTVIClientEvent(RTVIEvent.Config, async () => {
     const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-    const p: LLMContextMessage[] = await llmHelper.getContext();
-
-    setPrompt(p);
+    const context: LLMContext = await llmHelper.getContext();
+    setPrompt(context.messages);
   });
 
   useEffect(() => {
@@ -87,7 +80,7 @@ const Prompt: React.FC<PromptProps> = ({
                 {message.role}
               </span>
               <Textarea
-                value={message.content}
+                value={message.content as string}
                 rows={prompt?.length <= 1 ? 10 : 5}
                 onChange={(e) => updateContextMessage(i, e.currentTarget.value)}
                 className="text-sm w-full whitespace-pre-wrap"

@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LineChart, Loader2, LogOut, Settings, StopCircle } from "lucide-react";
 import {
-  PipecatMetrics,
+  PipecatMetricsData,
+  RTVIClientConfigOption,
+  RTVIEvent,
   TransportState,
-  VoiceClientConfigOption,
-  VoiceEvent,
 } from "realtime-ai";
-import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
+import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
 
 import StatsAggregator from "../../utils/stats_aggregator";
 import { Configure } from "../Setup";
@@ -30,13 +30,13 @@ interface SessionProps {
 
 export const Session = React.memo(
   ({ state, onLeave, startAudioOff = false }: SessionProps) => {
-    const voiceClient = useVoiceClient()!;
+    const voiceClient = useRTVIClient()!;
     const [hasStarted, setHasStarted] = useState<boolean>(false);
     const [showConfig, setShowConfig] = useState<boolean>(false);
     const [showStats, setShowStats] = useState<boolean>(false);
     const [muted, setMuted] = useState(startAudioOff);
     const [runtimeConfigUpdate, setRuntimeConfigUpdate] = useState<
-      VoiceClientConfigOption[] | null
+      RTVIClientConfigOption[] | null
     >(null);
     const [updatingConfig, setUpdatingConfig] = useState<boolean>(false);
 
@@ -46,17 +46,17 @@ export const Session = React.memo(
 
     // ---- Voice Client Events
 
-    useVoiceClientEvent(
-      VoiceEvent.Metrics,
-      useCallback((metrics: PipecatMetrics) => {
+    useRTVIClientEvent(
+      RTVIEvent.Metrics,
+      useCallback((metrics: PipecatMetricsData) => {
         metrics?.ttfb?.map((m: { processor: string; value: number }) => {
           stats_aggregator.addStat([m.processor, "ttfb", m.value, Date.now()]);
         });
       }, [])
     );
 
-    useVoiceClientEvent(
-      VoiceEvent.BotStoppedSpeaking,
+    useRTVIClientEvent(
+      RTVIEvent.BotStoppedSpeaking,
       useCallback(() => {
         if (hasStarted) return;
 
@@ -68,8 +68,8 @@ export const Session = React.memo(
       }, [hasStarted])
     );
 
-    useVoiceClientEvent(
-      VoiceEvent.UserStoppedSpeaking,
+    useRTVIClientEvent(
+      RTVIEvent.UserStoppedSpeaking,
       useCallback(() => {
         /*if (bongSoundRef.current) {
           bongSoundRef.current.volume = 0.5;
@@ -119,7 +119,7 @@ export const Session = React.memo(
       return () => current?.close();
     }, [showConfig]);
 
-    const onConfigUpdate = useCallback((config: VoiceClientConfigOption[]) => {
+    const onConfigUpdate = useCallback((config: RTVIClientConfigOption[]) => {
       setRuntimeConfigUpdate(config);
     }, []);
 

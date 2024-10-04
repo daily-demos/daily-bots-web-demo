@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Timer } from "lucide-react";
-import { VoiceEvent } from "realtime-ai";
-import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
+import { RTVIEvent } from "realtime-ai";
+import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
 
 import {
   Tooltip,
@@ -13,17 +13,17 @@ import { cn } from "@/utils/tailwind";
 import styles from "./styles.module.css";
 
 const ExpiryTimer: React.FC = () => {
-  const voiceClient = useVoiceClient();
+  const voiceClient = useRTVIClient();
   const [exp, setExp] = useState<number | undefined>(undefined);
   const [time, setTime] = useState({ minutes: 0, seconds: 0 });
 
-  useVoiceClientEvent(
-    VoiceEvent.Connected,
+  useRTVIClientEvent(
+    RTVIEvent.Connected,
     useCallback(() => setExp(voiceClient?.transportExpiry), [voiceClient])
   );
 
-  useVoiceClientEvent(
-    VoiceEvent.Disconnected,
+  useRTVIClientEvent(
+    RTVIEvent.Disconnected,
     useCallback(() => {
       setExp(undefined);
       setTime({ minutes: 0, seconds: 0 });
