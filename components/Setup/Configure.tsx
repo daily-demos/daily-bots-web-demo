@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
-import { useVoiceClient } from "realtime-ai-react";
+import React, { useCallback } from "react";
+import { RTVIClientConfigOption } from "realtime-ai";
+import { useRTVIClient } from "realtime-ai-react";
 
 import HelpTip from "../ui/helptip";
 import { Label } from "../ui/label";
@@ -14,7 +14,7 @@ interface ConfigureProps {
   startAudioOff?: boolean;
   inSession?: boolean;
   handleStartAudioOff?: () => void;
-  handleConfigUpdate?: (config: VoiceClientConfigOption[]) => void;
+  handleConfigUpdate?: (config: RTVIClientConfigOption[]) => void;
 }
 
 export const Configure: React.FC<ConfigureProps> = React.memo(
@@ -25,27 +25,25 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
     handleStartAudioOff,
     handleConfigUpdate,
   }) => {
-    const voiceClient = useVoiceClient()!;
+    const voiceClient = useRTVIClient()!;
 
     const updateConfig = useCallback(
       async (
-        config: VoiceClientConfigOption[],
-        services: VoiceClientServices | undefined
+        config: RTVIClientConfigOption[],
+        services: { [key: string]: string } | undefined
       ) => {
         if (inSession) {
           handleConfigUpdate?.(config);
           return;
         }
 
-        try {
-          if (services && services.llm !== voiceClient.services.llm) {
-            voiceClient.services = { ...voiceClient.services, ...services };
-          }
-        } catch (e) {
-          return;
-        }
+        console.log("[APPLY NEW PARAMS]", config, services);
+        voiceClient.params = { ...voiceClient.params, config, services };
 
-        voiceClient.updateConfig(config, true);
+        if (voiceClient.state === "ready") {
+          console.log("[APPLYING NEW CONFIG]", config);
+          voiceClient.updateConfig(config, true);
+        }
       },
       [voiceClient, inSession, handleConfigUpdate]
     );

@@ -1,23 +1,25 @@
 import React from "react";
-import { VoiceEvent } from "realtime-ai";
-import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
+import { RTVIEvent } from "realtime-ai";
+import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
 
 import styles from "./styles.module.css";
 
 const ModelBadge: React.FC = () => {
-  const voiceClient = useVoiceClient()!;
+  const voiceClient = useRTVIClient()!;
   const [model, setModel] = React.useState<string | undefined>(undefined);
 
-  const getModelFromConfig = () => {
-    if (!voiceClient) return;
+  const getModelFromConfig = async () => {
+    if (!voiceClient || voiceClient.state !== "ready") return;
 
-    setModel(
-      voiceClient.getServiceOptionValueFromConfig("llm", "model") as string
-    );
+    const model = (await voiceClient.getServiceOptionValueFromConfig(
+      "llm",
+      "model"
+    )) as string;
+
+    setModel(model);
   };
 
-  useVoiceClientEvent(VoiceEvent.ConfigUpdated, () => {
-    if (!voiceClient) return;
+  useRTVIClientEvent(RTVIEvent.Config, () => {
     getModelFromConfig();
   });
 

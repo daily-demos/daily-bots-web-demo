@@ -8,12 +8,8 @@ import React, {
 import { cx } from "class-variance-authority";
 import { Languages } from "lucide-react";
 import Image from "next/image";
-import {
-  VoiceClientConfigOption,
-  VoiceClientServices,
-  VoiceEvent,
-} from "realtime-ai";
-import { useVoiceClient, useVoiceClientEvent } from "realtime-ai-react";
+import { LLMHelper, RTVIClientConfigOption, RTVIEvent } from "realtime-ai";
+import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
 
 import { AppContext } from "@/components/context";
 import {
@@ -46,8 +42,8 @@ type CharacterData = {
 interface ConfigSelectProps {
   state: string;
   onConfigUpdate: (
-    config: VoiceClientConfigOption[],
-    services?: VoiceClientServices
+    config: RTVIClientConfigOption[],
+    services?: { [key: string]: string }
   ) => void;
   inSession?: boolean;
 }
@@ -68,7 +64,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   state,
   inSession = false,
 }) => {
-  const voiceClient = useVoiceClient();
+  const voiceClient = useRTVIClient();
   const { character, setCharacter, language, setLanguage } =
     useContext(AppContext);
   const [llmProvider, setLlmProvider] = useState<string>();
@@ -78,9 +74,10 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   const [showPrompt, setshowPrompt] = useState<boolean>(false);
   const modalRef = useRef<HTMLDialogElement>(null);
 
-  useVoiceClientEvent(
-    VoiceEvent.ConfigUpdated,
+  useRTVIClientEvent(
+    RTVIEvent.Config,
     useCallback(() => {
+      // Update character after config has been applied
       setCharacter(bufferedCharacter);
     }, [bufferedCharacter, setCharacter])
   );
@@ -98,104 +95,109 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     return () => current?.close();
   }, [showPrompt]);
 
-  // Assign default values from client config
   useEffect(() => {
     if (!voiceClient) return;
 
-    // Get the current llm provider and model
-    setLlmProvider(voiceClient.services.llm ?? llmProviders[0].value);
+    // Assign default values from initial config
+    const currentServices = voiceClient.params.services as {
+      [key: string]: string;
+    };
+    const currentConfig: RTVIClientConfigOption[] = voiceClient.params
+      .config as RTVIClientConfigOption[];
 
-    // Get the current config llm model
-    setLlmModel(
-      voiceClient.getServiceOptionValueFromConfig("llm", "model") as string
-    );
+    // Get the current or default llm provider
+    setLlmProvider(currentServices.llm ?? llmProviders[0].value);
+
+    // Get the current or default llm model
+    const model = currentConfig
+      .find((c) => c.service === "llm")
+      ?.options.find((o) => o.name === "model")?.value as string;
+    setLlmModel(model);
 
     // Get the current config vad stop secs
-    setVadStopSecs(
-      (
-        voiceClient.getServiceOptionValueFromConfig("vad", "params") as {
-          stop_secs: number;
-        }
-      ).stop_secs
-    );
+    const vadParams = currentConfig
+      .find((c) => c.service === "vad")
+      ?.options.find((o) => o.name === "params")?.value as {
+      [key: string]: number;
+    };
+    setVadStopSecs(vadParams.stop_secs);
   }, [voiceClient]);
 
-  // Update the config options when the character changes
   useEffect(() => {
+    // Update the config options when the character changes
     if (!llmModel || !llmProvider || !vadStopSecs || !voiceClient) return;
 
     // Get character data
     const characterData = PRESET_CHARACTERS[bufferedCharacter] as CharacterData;
 
     // Compose new config object
-    const updatedConfig: VoiceClientConfigOption[] =
-      voiceClient.setConfigOptions([
-        {
-          service: "vad",
-          options: [{ name: "params", value: { stop_secs: vadStopSecs } }],
-        },
-        {
-          service: "tts",
-          options: [
-            {
-              name: "voice",
-              value:
-                language !== 0
-                  ? LANGUAGES[language].default_voice
-                  : characterData.voice,
-            },
-            {
-              name: "model",
-              value: LANGUAGES[language].tts_model,
-            },
-            {
-              name: "language",
-              value: LANGUAGES[language].value,
-            },
-          ],
-        },
-        {
-          service: "llm",
-          options: [
-            {
-              name: "model",
-              value: llmModel,
-            },
-            {
-              name: "initial_messages",
-              value: [
-                {
-                  role: "system",
-                  content:
-                    language !== 0
-                      ? defaultLLMPrompt +
-                        `\nRespond only in ${LANGUAGES[language].label} please.`
-                          .split("\n")
-                          .map((line) => line.trim())
-                          .join("\n")
-                      : characterData.prompt
-                          .split("\n")
-                          .map((line) => line.trim())
-                          .join("\n"),
-                },
-              ],
-            },
-          ],
-        },
-        {
-          service: "stt",
-          options: [
-            {
-              name: "model",
-              value: LANGUAGES[language].stt_model,
-            },
-            {
-              name: "language",
-              value: LANGUAGES[language].value,
-            },
-          ],
-        },
-      ]);
+    const updatedConfig: RTVIClientConfigOption[] = [
+      {
+        service: "vad",
+        options: [{ name: "params", value: { stop_secs: vadStopSecs } }],
+      },
+      {
+        service: "tts",
+        options: [
+          {
+            name: "voice",
+            value:
+              language !== 0
+                ? LANGUAGES[language].default_voice
+                : characterData.voice,
+          },
+          {
+            name: "model",
+            value: LANGUAGES[language].tts_model,
+          },
+          {
+            name: "language",
+            value: LANGUAGES[language].value,
+          },
+        ],
+      },
+      {
+        service: "llm",
+        options: [
+          {
+            name: "model",
+            value: llmModel,
+          },
+          {
+            name: "initial_messages",
+            value: [
+              {
+                role: "system",
+                content:
+                  language !== 0
+                    ? defaultLLMPrompt +
+                      `\nRespond only in ${LANGUAGES[language].label} please.`
+                        .split("\n")
+                        .map((line) => line.trim())
+                        .join("\n")
+                    : characterData.prompt
+                        .split("\n")
+                        .map((line) => line.trim())
+                        .join("\n"),
+              },
+            ],
+          },
+        ],
+      },
+      {
+        service: "stt",
+        options: [
+          {
+            name: "model",
+            value: LANGUAGES[language].stt_model,
+          },
+          {
+            name: "language",
+            value: LANGUAGES[language].value,
+          },
+        ],
+      },
+    ];
 
     onConfigUpdate(updatedConfig, { llm: llmProvider });
   }, [
@@ -219,12 +221,21 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
           characterPrompt={PRESET_CHARACTERS[bufferedCharacter].prompt}
           handleUpdate={(prompt) => {
             if (!voiceClient) return;
-            const newConfig = voiceClient.setServiceOptionInConfig("llm", {
-              name: inSession ? "messages" : "initial_messages",
-              value: prompt,
-            });
 
-            onConfigUpdate(newConfig);
+            if (inSession) {
+              console.log(["CALL SET CONTEXT HERE", prompt]);
+              voiceClient
+                .getHelper<LLMHelper>("llm")
+                ?.setContext({ messages: prompt });
+            } else {
+              const newConfig = voiceClient.params
+                .config as RTVIClientConfigOption[];
+              newConfig
+                .find((c) => c.service === "llm")!
+                .options.find((o) => o.name === "initial_messages")!.value =
+                prompt;
+              onConfigUpdate(newConfig);
+            }
           }}
           handleClose={() => setshowPrompt(false)}
         />
