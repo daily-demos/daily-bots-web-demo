@@ -182,6 +182,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
               },
             ],
           },
+          { name: "run_on_config", value: true },
         ],
       },
       {
