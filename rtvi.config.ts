@@ -6,7 +6,7 @@ export const defaultMaxDuration = 600;
 export const LANGUAGES = [
   {
     label: "English",
-    value: "en-US",
+    value: "en",
     tts_model: "sonic-english",
     stt_model: "nova-2-conversationalai",
     default_voice: "79a125e8-cd45-4c13-8a67-188112f4dd22",
@@ -68,7 +68,7 @@ Your responses will converted to audio. Please do not include any special charac
 Start by briefly introducing yourself.`;
 
 export const defaultConfig = [
-  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.3 } }] },
+  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.5 } }] },
   {
     service: "tts",
     options: [

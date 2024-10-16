@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import { VoiceError, VoiceEvent, VoiceMessage } from "realtime-ai";
+import { RTVIError, RTVIEvent, RTVIMessage } from "realtime-ai";
 import {
-  useVoiceClient,
-  useVoiceClientEvent,
-  useVoiceClientTransportState,
+  useRTVIClient,
+  useRTVIClientEvent,
+  useRTVIClientTransportState,
 } from "realtime-ai-react";
 
 import { Alert } from "./ui/alert";
@@ -24,8 +24,8 @@ const status_text = {
 };
 
 export default function App() {
-  const voiceClient = useVoiceClient()!;
-  const transportState = useVoiceClientTransportState();
+  const voiceClient = useRTVIClient()!;
+  const transportState = useRTVIClientTransportState();
 
   const [appState, setAppState] = useState<
     "idle" | "ready" | "connecting" | "connected"
@@ -33,9 +33,9 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [startAudioOff, setStartAudioOff] = useState<boolean>(false);
 
-  useVoiceClientEvent(
-    VoiceEvent.Error,
-    useCallback((message: VoiceMessage) => {
+  useRTVIClientEvent(
+    RTVIEvent.Error,
+    useCallback((message: RTVIMessage) => {
       const errorData = message.data as { error: string; fatal: boolean };
       if (!errorData.fatal) return;
       setError(errorData.error);
@@ -77,9 +77,17 @@ export default function App() {
       // Disable the mic until the bot has joined
       // to avoid interrupting the bot's welcome message
       voiceClient.enableMic(false);
-      await voiceClient.start();
+      console.log("[CONNECT PARAMS]", voiceClient.params);
+      voiceClient.params = {
+        ...voiceClient.params,
+        requestData: {
+          config: voiceClient.params.config,
+          services: voiceClient.params.services,
+        },
+      };
+      await voiceClient.connect();
     } catch (e) {
-      setError((e as VoiceError).message || "Unknown error occured");
+      setError((e as RTVIError).message || "Unknown error occured");
       voiceClient.disconnect();
     }
   }
