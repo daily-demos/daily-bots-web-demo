@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     services,
     api_keys: {
       openai: process.env.OPENAI_API_KEY,
+      gemini: process.env.GEMINI_API_KEY,
     },
     config: [...config],
   };

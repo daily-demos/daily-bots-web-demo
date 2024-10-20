@@ -132,6 +132,20 @@ export const LLM_MODEL_CHOICES = [
     ],
   },
   {
+    label: "Gemini",
+    value: "gemini",
+    models: [
+      {
+        label: "Gemini 1.5 Flash",
+        value: "gemini-1.5-flash"
+      },
+      {
+        label: "Gemini 1.5 Flash 8b",
+        value: "gemini-1.5-flash-8b"
+      },
+    ]
+  },  
+  {
     label: "Open AI",
     value: "openai",
     models: [

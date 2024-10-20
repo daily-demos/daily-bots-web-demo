@@ -20,6 +20,8 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           Together Llama 3.1 &nbsp; 8B <br />
           Together Llama 3.1 &nbsp; 70B <br />
           Together Llama 3.1 &nbsp; 405B <br />
+          Gemini 1.5 Flash <br/>
+          Gemini 1.5 Flash &nbsp; 8b <br/>
           GPT-4o mini
         </p>
 
