@@ -8,7 +8,7 @@ export const LANGUAGES = [
     label: "English",
     value: "en",
     tts_model: "sonic-english",
-    stt_model: "nova-2-conversationalai",
+    stt_model: "nova-2-general",
     default_voice: "79a125e8-cd45-4c13-8a67-188112f4dd22",
   },
   {
