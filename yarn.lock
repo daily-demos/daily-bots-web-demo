@@ -24,16 +24,24 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-4.0.0.tgz#7dfccb9df5499e627e7bfdbb4021a06813a45dba"
   integrity sha512-189nelqtPd8++phaHNwYovKZI0FOzH1vQEE3QhHHkNIGrg5fSs9CbYP3RvfEH5geztnIA9Jwq91wyOIwAW5JIQ==
 
-"@daily-co/daily-js@>=0.72.0":
-  version "0.72.0"
-  resolved "https://registry.yarnpkg.com/@daily-co/daily-js/-/daily-js-0.72.0.tgz#a54986506ff2658ebcedcfe26e0d5988b5e61f1b"
-  integrity sha512-kDzrfTmNr7p7YT1TzQ6bomxhrYWjbpD2od0Fx02Ovuam3YdiZgidW5Z4V0U0wHl8aP7buiUvvSC3k9gOW8yB7Q==
+"@daily-co/daily-js@^0.72.0":
+  version "0.72.1"
+  resolved "https://registry.yarnpkg.com/@daily-co/daily-js/-/daily-js-0.72.1.tgz#8505dc46abf2526f0a533e29d739e65bce8bc307"
+  integrity sha512-4dw24cmH8tRBDFe/mqjpM6ZV1s07aSoPMtsVXlEB6ZLD/Apd5GB4x1URDidG45iPDs8/4P8iDHR6RtMjKht4Ig==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@sentry/browser" "^7.60.1"
     bowser "^2.8.1"
     dequal "^2.0.3"
     events "^3.1.0"
+
+"@daily-co/realtime-ai-daily@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@daily-co/realtime-ai-daily/-/realtime-ai-daily-0.2.0.tgz#949ccb44437139dd0ed42bbfd65645f116eeac5c"
+  integrity sha512-wuotUFF1tcu6ibJvFXHosFH5dP0k0X6iEWwu8mS5c1Fx1RjVxp/DIR6DV4GnSlBoqcSjWvCuKfMHBzDDn1CGhw==
+  dependencies:
+    "@daily-co/daily-js" "^0.72.0"
+    realtime-ai "0.2.0"
 
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.4.0"
@@ -1444,11 +1452,6 @@ eslint-plugin-react@^7.33.2:
     string.prototype.matchall "^4.0.11"
     string.prototype.repeat "^1.0.0"
 
-eslint-plugin-simple-import-sort@^12.1.1:
-  version "12.1.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-simple-import-sort/-/eslint-plugin-simple-import-sort-12.1.1.tgz#e64bfdaf91c5b98a298619aa634a9f7aa43b709e"
-  integrity sha512-6nuzu4xwQtE3332Uz0to+TxDQYRLTKRESSc2hefVT48Zc8JthmN23Gx9lnYhu0FtkRSL1oxny3kJ2aveVhmOVA==
-
 eslint-scope@^7.2.2:
   version "7.2.2"
   resolved "https://registry.yarnpkg.com/eslint-scope/-/eslint-scope-7.2.2.tgz#deb4f92563390f32006894af62a22dba1c46423f"
@@ -2664,24 +2667,17 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
-realtime-ai-daily@0.2.0-rc.3:
-  version "0.2.0-rc.3"
-  resolved "https://registry.yarnpkg.com/realtime-ai-daily/-/realtime-ai-daily-0.2.0-rc.3.tgz#eb7b9480ef83b8e725db46b707d7c11cbd4ffc98"
-  integrity sha512-bCAJSQiLqzKGw/aXLYAyKwQnVCFl0rqA7op/faQH/b3+RGpWVF2HdRFi+PkgAGJC3hlyElYv7mcp9bZL/1td6g==
-  dependencies:
-    "@daily-co/daily-js" ">=0.72.0"
-
-realtime-ai-react@0.2.0-rc.3:
-  version "0.2.0-rc.3"
-  resolved "https://registry.yarnpkg.com/realtime-ai-react/-/realtime-ai-react-0.2.0-rc.3.tgz#d624315a3564f82833fa1432483a7c0bacf6c5a2"
-  integrity sha512-fM2SfMsE3DLHPTrT+C4PcwHUQ6WSvhpkygRRNW7qJjU2voC1YBLmH81A0Nu9YeHbHGJGQH30990K6aDbvRxTmw==
+realtime-ai-react@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/realtime-ai-react/-/realtime-ai-react-0.2.0.tgz#bf5154f421f6da315605128b10079e9a520a75ed"
+  integrity sha512-Ogf71eLyMLKLAcBZltTFWJrLtGUNeEPEcxP+MPnQUK4E1GEVUPqiP2BLxV/1nKqo9xhhnjAGf+lZF3XKkXTqiA==
   dependencies:
     jotai "^2.9.0"
 
-realtime-ai@0.2.0-rc.3:
-  version "0.2.0-rc.3"
-  resolved "https://registry.yarnpkg.com/realtime-ai/-/realtime-ai-0.2.0-rc.3.tgz#23f487337b7dfb56c73de9d0f47dd26e6d33e409"
-  integrity sha512-CjUsyxLRtbTh1wWV+G3LYmeyQAMKr2qFgQuDhW47LHf9SZSj4bKRfRU2M10YeYYDxWtsldWJ3aEwEBzybinopA==
+realtime-ai@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/realtime-ai/-/realtime-ai-0.2.0.tgz#d7aff7257bb924ea44aafbc6e6c04bb2a33024c7"
+  integrity sha512-lr+8X8zyZe8/2eL6gfK6FKEivBl6TjpSyE0JgaMi9N/2MbTltXO9wzsnd3SrlMHKojbjbx+xHe8AMbv3MlnVSg==
   dependencies:
     "@types/events" "^3.0.3"
     clone-deep "^4.0.1"

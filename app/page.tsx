@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { DailyTransport } from "@daily-co/realtime-ai-daily";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { useEffect, useRef, useState } from "react";
 import { LLMHelper, RTVIClient } from "realtime-ai";
-import { DailyTransport } from "realtime-ai-daily";
 import { RTVIClientAudio, RTVIClientProvider } from "realtime-ai-react";
 
 import App from "@/components/App";
@@ -29,8 +29,10 @@ export default function Home() {
       transport: new DailyTransport(),
       params: {
         baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "/api",
-        services: defaultServices,
-        config: defaultConfig,
+        requestData: {
+          services: defaultServices,
+          config: defaultConfig,
+        },
       },
       timeout: BOT_READY_TIMEOUT,
     });

@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { RTVIError, RTVIEvent, RTVIMessage } from "realtime-ai";
 import {
   useRTVIClient,
@@ -9,15 +9,15 @@ import {
   useRTVIClientTransportState,
 } from "realtime-ai-react";
 
+import { AppContext } from "./context";
+import Session from "./Session";
+import { Configure } from "./Setup";
 import { Alert } from "./ui/alert";
 import { Button } from "./ui/button";
 import * as Card from "./ui/card";
-import Session from "./Session";
-import { Configure } from "./Setup";
 
 const status_text = {
   idle: "Initializing...",
-  initializing: "Initializing...",
   initialized: "Start",
   authenticating: "Requesting bot...",
   connecting: "Connecting...",
@@ -32,6 +32,8 @@ export default function App() {
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [startAudioOff, setStartAudioOff] = useState<boolean>(false);
+  const mountedRef = useRef<boolean>(false);
+  const { clientParams } = useContext(AppContext);
 
   useRTVIClientEvent(
     RTVIEvent.Error,
@@ -44,9 +46,20 @@ export default function App() {
 
   useEffect(() => {
     // Initialize local audio devices
-    if (!voiceClient || appState !== "idle") return;
+    if (!voiceClient || mountedRef.current) return;
+    mountedRef.current = true;
     voiceClient.initDevices();
   }, [appState, voiceClient]);
+
+  useEffect(() => {
+    voiceClient.params = {
+      ...voiceClient.params,
+      requestData: {
+        ...voiceClient.params.requestData,
+        ...clientParams,
+      },
+    };
+  }, [voiceClient, appState, clientParams]);
 
   useEffect(() => {
     // Update app state based on voice client transport state.
@@ -77,14 +90,6 @@ export default function App() {
       // Disable the mic until the bot has joined
       // to avoid interrupting the bot's welcome message
       voiceClient.enableMic(false);
-      console.log("[CONNECT PARAMS]", voiceClient.params);
-      voiceClient.params = {
-        ...voiceClient.params,
-        requestData: {
-          config: voiceClient.params.config,
-          services: voiceClient.params.services,
-        },
-      };
       await voiceClient.connect();
     } catch (e) {
       setError((e as RTVIError).message || "Unknown error occured");

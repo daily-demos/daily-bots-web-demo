@@ -1,6 +1,6 @@
+import { LineChart, Loader2, LogOut, Settings, StopCircle } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LineChart, Loader2, LogOut, Settings, StopCircle } from "lucide-react";
 import {
   PipecatMetricsData,
   RTVIClientConfigOption,
@@ -119,10 +119,6 @@ export const Session = React.memo(
       return () => current?.close();
     }, [showConfig]);
 
-    const onConfigUpdate = useCallback((config: RTVIClientConfigOption[]) => {
-      setRuntimeConfigUpdate(config);
-    }, []);
-
     function toggleMute() {
       voiceClient.enableMic(muted);
       setMuted(!muted);
@@ -136,11 +132,7 @@ export const Session = React.memo(
               <Card.CardTitle>Configuration</Card.CardTitle>
             </Card.CardHeader>
             <Card.CardContent>
-              <Configure
-                state={state}
-                inSession={true}
-                handleConfigUpdate={onConfigUpdate}
-              />
+              <Configure state={state} inSession={true} />
             </Card.CardContent>
             <Card.CardFooter isButtonArray>
               <Button variant="outline" onClick={() => setShowConfig(false)}>
@@ -148,14 +140,19 @@ export const Session = React.memo(
               </Button>
               <Button
                 variant="success"
-                disabled={updatingConfig || runtimeConfigUpdate === null}
+                disabled={updatingConfig}
                 onClick={async () => {
-                  if (!runtimeConfigUpdate) return;
+                  const config: RTVIClientConfigOption[] = (
+                    voiceClient.params.requestData as {
+                      config: RTVIClientConfigOption[];
+                    }
+                  )?.config;
+                  if (!config) return;
+
                   setUpdatingConfig(true);
-                  await voiceClient.updateConfig(runtimeConfigUpdate);
+                  await voiceClient.updateConfig(config);
                   // On update, reset state
                   setUpdatingConfig(false);
-                  setRuntimeConfigUpdate(null);
                   setShowConfig(false);
                 }}
               >
@@ -231,10 +228,7 @@ export const Session = React.memo(
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => {
-                    setRuntimeConfigUpdate(null);
-                    setShowConfig(true);
-                  }}
+                  onClick={() => setShowConfig(true)}
                 >
                   <Settings />
                 </Button>

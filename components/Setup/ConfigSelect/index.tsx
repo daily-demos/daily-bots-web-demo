@@ -1,3 +1,6 @@
+import { cx } from "class-variance-authority";
+import { Languages } from "lucide-react";
+import Image from "next/image";
 import React, {
   useCallback,
   useContext,
@@ -5,11 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { cx } from "class-variance-authority";
-import { Languages } from "lucide-react";
-import Image from "next/image";
-import { LLMHelper, RTVIClientConfigOption, RTVIEvent } from "realtime-ai";
-import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
+import { RTVIClientConfigOption } from "realtime-ai";
 
 import { AppContext } from "@/components/context";
 import {
@@ -41,10 +40,8 @@ type CharacterData = {
 
 interface ConfigSelectProps {
   state: string;
-  onConfigUpdate: (
-    config: RTVIClientConfigOption[],
-    services?: { [key: string]: string }
-  ) => void;
+  onServiceUpdate: (service: { [key: string]: string }) => void;
+  onConfigUpdate: (configOption: RTVIClientConfigOption[]) => void;
   inSession?: boolean;
 }
 
@@ -61,26 +58,32 @@ const tileActiveCX = cx("*:opacity-100 bg-primary-100/70 border-transparent");
 
 export const ConfigSelect: React.FC<ConfigSelectProps> = ({
   onConfigUpdate,
+  onServiceUpdate,
   state,
   inSession = false,
 }) => {
-  const voiceClient = useRTVIClient();
-  const { character, setCharacter, language, setLanguage } =
+  const { character, setCharacter, language, setLanguage, clientParams } =
     useContext(AppContext);
-  const [llmProvider, setLlmProvider] = useState<string>();
-  const [llmModel, setLlmModel] = useState<string>();
-  const [vadStopSecs, setVadStopSecs] = useState<number>();
-  const [bufferedCharacter, setBufferedCharacter] = useState<number>(character);
+
+  const [llmProvider, setLlmProvider] = useState<string>(
+    clientParams.services.llm
+  );
+  const [llmModel, setLlmModel] = useState<string>(
+    clientParams.config
+      .find((c) => c.service === "llm")
+      ?.options.find((p) => p.name === "model")?.value as string
+  );
+  const [vadStopSecs, setVadStopSecs] = useState<number>(
+    (
+      clientParams.config
+        .find((c) => c.service === "vad")
+        ?.options.find((p) => p.name === "params")?.value as {
+        stop_secs: number;
+      }
+    )?.stop_secs
+  );
   const [showPrompt, setshowPrompt] = useState<boolean>(false);
   const modalRef = useRef<HTMLDialogElement>(null);
-
-  useRTVIClientEvent(
-    RTVIEvent.Config,
-    useCallback(() => {
-      // Update character after config has been applied
-      setCharacter(bufferedCharacter);
-    }, [bufferedCharacter, setCharacter])
-  );
 
   useEffect(() => {
     // Modal effect
@@ -95,121 +98,76 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     return () => current?.close();
   }, [showPrompt]);
 
-  useEffect(() => {
-    if (!voiceClient) return;
+  const composeConfig = useCallback(
+    (character: number, language: number) => {
+      // Get character data
+      const characterData = PRESET_CHARACTERS[character] as CharacterData;
 
-    // Assign default values from initial config
-    const currentServices = voiceClient.params.services as {
-      [key: string]: string;
-    };
-    const currentConfig: RTVIClientConfigOption[] = voiceClient.params
-      .config as RTVIClientConfigOption[];
+      // Compose new config object
+      const updatedConfig: RTVIClientConfigOption[] = [
+        {
+          service: "tts",
+          options: [
+            {
+              name: "voice",
+              value:
+                language !== 0
+                  ? LANGUAGES[language].default_voice
+                  : characterData.voice,
+            },
+            {
+              name: "model",
+              value: LANGUAGES[language].tts_model,
+            },
+            {
+              name: "language",
+              value: LANGUAGES[language].value,
+            },
+          ],
+        },
+        {
+          service: "llm",
+          options: [
+            {
+              name: "initial_messages",
+              value: [
+                {
+                  role: "system",
+                  content:
+                    language !== 0
+                      ? defaultLLMPrompt +
+                        `\nRespond only in ${LANGUAGES[language].label} please.`
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .join("\n")
+                      : characterData.prompt
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .join("\n"),
+                },
+              ],
+            },
+          ],
+        },
+        {
+          service: "stt",
+          options: [
+            {
+              name: "model",
+              value: LANGUAGES[language].stt_model,
+            },
+            {
+              name: "language",
+              value: LANGUAGES[language].value,
+            },
+          ],
+        },
+      ];
 
-    // Get the current or default llm provider
-    setLlmProvider(currentServices.llm ?? llmProviders[0].value);
-
-    // Get the current or default llm model
-    const model = currentConfig
-      .find((c) => c.service === "llm")
-      ?.options.find((o) => o.name === "model")?.value as string;
-    setLlmModel(model);
-
-    // Get the current config vad stop secs
-    const vadParams = currentConfig
-      .find((c) => c.service === "vad")
-      ?.options.find((o) => o.name === "params")?.value as {
-      [key: string]: number;
-    };
-    setVadStopSecs(vadParams.stop_secs);
-  }, [voiceClient]);
-
-  useEffect(() => {
-    // Update the config options when the character changes
-    if (!llmModel || !llmProvider || !vadStopSecs || !voiceClient) return;
-
-    // Get character data
-    const characterData = PRESET_CHARACTERS[bufferedCharacter] as CharacterData;
-
-    // Compose new config object
-    const updatedConfig: RTVIClientConfigOption[] = [
-      {
-        service: "vad",
-        options: [{ name: "params", value: { stop_secs: vadStopSecs } }],
-      },
-      {
-        service: "tts",
-        options: [
-          {
-            name: "voice",
-            value:
-              language !== 0
-                ? LANGUAGES[language].default_voice
-                : characterData.voice,
-          },
-          {
-            name: "model",
-            value: LANGUAGES[language].tts_model,
-          },
-          {
-            name: "language",
-            value: LANGUAGES[language].value,
-          },
-        ],
-      },
-      {
-        service: "llm",
-        options: [
-          {
-            name: "model",
-            value: llmModel,
-          },
-          {
-            name: "initial_messages",
-            value: [
-              {
-                role: "system",
-                content:
-                  language !== 0
-                    ? defaultLLMPrompt +
-                      `\nRespond only in ${LANGUAGES[language].label} please.`
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .join("\n")
-                    : characterData.prompt
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .join("\n"),
-              },
-            ],
-          },
-          { name: "run_on_config", value: true },
-        ],
-      },
-      {
-        service: "stt",
-        options: [
-          {
-            name: "model",
-            value: LANGUAGES[language].stt_model,
-          },
-          {
-            name: "language",
-            value: LANGUAGES[language].value,
-          },
-        ],
-      },
-    ];
-
-    onConfigUpdate(updatedConfig, { llm: llmProvider });
-  }, [
-    llmProvider,
-    llmModel,
-    language,
-    voiceClient,
-    onConfigUpdate,
-    bufferedCharacter,
-    vadStopSecs,
-  ]);
+      onConfigUpdate(updatedConfig);
+    },
+    [onConfigUpdate]
+  );
 
   const availableModels = LLM_MODEL_CHOICES.find(
     (choice) => choice.value === llmProvider
@@ -219,24 +177,14 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
     <>
       <dialog ref={modalRef}>
         <Prompt
-          characterPrompt={PRESET_CHARACTERS[bufferedCharacter].prompt}
+          characterPrompt={PRESET_CHARACTERS[character].prompt}
           handleUpdate={(prompt) => {
-            if (!voiceClient) return;
-
-            if (inSession) {
-              console.log(["CALL SET CONTEXT HERE", prompt]);
-              voiceClient
-                .getHelper<LLMHelper>("llm")
-                ?.setContext({ messages: prompt });
-            } else {
-              const newConfig = voiceClient.params
-                .config as RTVIClientConfigOption[];
-              newConfig
-                .find((c) => c.service === "llm")!
-                .options.find((o) => o.name === "initial_messages")!.value =
-                prompt;
-              onConfigUpdate(newConfig);
-            }
+            onConfigUpdate([
+              {
+                service: "llm",
+                options: [{ name: "initial_messages", value: prompt }],
+              },
+            ]);
           }}
           handleClose={() => setshowPrompt(false)}
         />
@@ -244,7 +192,10 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
       <div className="flex flex-col flex-wrap gap-4">
         <Field label="Language" error={false}>
           <Select
-            onChange={(e) => setLanguage(parseInt(e.currentTarget.value))}
+            onChange={(e) => {
+              composeConfig(character, parseInt(e.currentTarget.value));
+              setLanguage(parseInt(e.currentTarget.value));
+            }}
             value={language}
             icon={<Languages size={24} />}
           >
@@ -265,10 +216,14 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
                     <Select
                       disabled={inSession && !["ready", "idle"].includes(state)}
                       className="flex-1"
-                      value={bufferedCharacter}
-                      onChange={(e) =>
-                        setBufferedCharacter(parseInt(e.currentTarget.value))
-                      }
+                      value={character}
+                      onChange={(e) => {
+                        setCharacter(parseInt(e.currentTarget.value));
+                        composeConfig(
+                          parseInt(e.currentTarget.value),
+                          language
+                        );
+                      }}
                     >
                       {PRESET_CHARACTERS.map(({ name }, i) => (
                         <option key={`char-${i}`} value={i}>
@@ -301,13 +256,28 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
                           )}
                           key={value}
                           onClick={() => {
-                            if (!["ready", "idle"].includes(state)) return;
+                            if (value === llmProvider) return;
 
                             setLlmProvider(value);
-                            setLlmModel(
-                              llmProviders.find((p) => p.value === value)
-                                ?.models[0].value!
-                            );
+
+                            const defaultProviderModel = llmProviders.find(
+                              (p) => p.value === value
+                            )?.models[0].value!;
+                            setLlmModel(defaultProviderModel);
+
+                            // Update app context
+                            onServiceUpdate({ llm: value });
+                            onConfigUpdate([
+                              {
+                                service: "llm",
+                                options: [
+                                  {
+                                    name: "model",
+                                    value: defaultProviderModel,
+                                  },
+                                ],
+                              },
+                            ]);
                           }}
                         >
                           <Image
@@ -325,7 +295,17 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
 
                 <Label>Model</Label>
                 <Select
-                  onChange={(e) => setLlmModel(e.currentTarget.value)}
+                  onChange={(e) => {
+                    setLlmModel(e.currentTarget.value);
+                    onConfigUpdate([
+                      {
+                        service: "llm",
+                        options: [
+                          { name: "model", value: e.currentTarget.value },
+                        ],
+                      },
+                    ]);
+                  }}
                   value={llmModel}
                 >
                   {availableModels?.map(({ value, label }) => (
@@ -343,7 +323,14 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
               <StopSecs
                 vadStopSecs={vadStopSecs}
                 handleChange={(v) => {
-                  setVadStopSecs(v[0]);
+                  setVadStopSecs(v);
+
+                  onConfigUpdate([
+                    {
+                      service: "vad",
+                      options: [{ name: "params", value: { stop_secs: v } }],
+                    },
+                  ]);
                 }}
               />
             </AccordionContent>

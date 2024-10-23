@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  LLMContext,
-  LLMContextMessage,
-  LLMHelper,
-  RTVIEvent,
-} from "realtime-ai";
-import { useRTVIClient, useRTVIClientEvent } from "realtime-ai-react";
+import { LLMContextMessage } from "realtime-ai";
+import { useRTVIClient } from "realtime-ai-react";
 
 import { Button } from "../ui/button";
 import * as Card from "../ui/card";
@@ -27,12 +22,6 @@ const Prompt: React.FC<PromptProps> = ({
     undefined
   );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
-
-  useRTVIClientEvent(RTVIEvent.Config, async () => {
-    const llmHelper = voiceClient.getHelper("llm") as LLMHelper;
-    const context: LLMContext = await llmHelper.getContext();
-    setPrompt(context.messages);
-  });
 
   useEffect(() => {
     if (!characterPrompt) return;
