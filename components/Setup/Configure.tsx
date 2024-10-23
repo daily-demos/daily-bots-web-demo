@@ -26,7 +26,7 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
       (newService: { [key: string]: string }) => {
         setClientParams({ services: newService });
       },
-      []
+      [setClientParams]
     );
 
     const handleConfigOptionUpdate = useCallback(
