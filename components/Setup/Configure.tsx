@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { VoiceClientConfigOption, VoiceClientServices } from "realtime-ai";
-import { useVoiceClient } from "realtime-ai-react";
+import React, { useCallback, useContext } from "react";
 
 import HelpTip from "../ui/helptip";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 
+import { RTVIClientConfigOption } from "realtime-ai";
+import { useRTVIClient } from "realtime-ai-react";
+import { AppContext } from "../context";
 import ConfigSelect from "./ConfigSelect";
 import DeviceSelect from "./DeviceSelect";
 
@@ -14,40 +15,29 @@ interface ConfigureProps {
   startAudioOff?: boolean;
   inSession?: boolean;
   handleStartAudioOff?: () => void;
-  handleConfigUpdate?: (config: VoiceClientConfigOption[]) => void;
 }
 
 export const Configure: React.FC<ConfigureProps> = React.memo(
-  ({
-    startAudioOff,
-    state,
-    inSession = false,
-    handleStartAudioOff,
-    handleConfigUpdate,
-  }) => {
-    const voiceClient = useVoiceClient()!;
+  ({ startAudioOff, state, inSession = false, handleStartAudioOff }) => {
+    const { clientParams, setClientParams } = useContext(AppContext);
+    const voiceClient = useRTVIClient()!;
 
-    const updateConfig = useCallback(
-      async (
-        config: VoiceClientConfigOption[],
-        services: VoiceClientServices | undefined
-      ) => {
-        if (inSession) {
-          handleConfigUpdate?.(config);
-          return;
-        }
-
-        try {
-          if (services && services.llm !== voiceClient.services.llm) {
-            voiceClient.services = { ...voiceClient.services, ...services };
-          }
-        } catch (e) {
-          return;
-        }
-
-        voiceClient.updateConfig(config, true);
+    const handleServiceUpdate = useCallback(
+      (newService: { [key: string]: string }) => {
+        setClientParams({ services: newService });
       },
-      [voiceClient, inSession, handleConfigUpdate]
+      [setClientParams]
+    );
+
+    const handleConfigOptionUpdate = useCallback(
+      async (newConfigOptions: RTVIClientConfigOption[]) => {
+        const newConfig = await voiceClient.setConfigOptions(
+          newConfigOptions,
+          clientParams.config
+        );
+        setClientParams({ config: newConfig });
+      },
+      [voiceClient, clientParams.config, setClientParams]
     );
 
     return (
@@ -56,7 +46,8 @@ export const Configure: React.FC<ConfigureProps> = React.memo(
           <DeviceSelect hideMeter={false} />
           <ConfigSelect
             state={state}
-            onConfigUpdate={updateConfig}
+            onConfigUpdate={handleConfigOptionUpdate}
+            onServiceUpdate={handleServiceUpdate}
             inSession={inSession}
           />
         </section>

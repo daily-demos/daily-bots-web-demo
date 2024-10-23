@@ -1,12 +1,22 @@
-import React, { createContext, ReactNode, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useState } from "react";
+import { RTVIClientConfigOption } from "realtime-ai";
+import { defaultConfig, defaultServices } from "../rtvi.config";
 
-import { LANGUAGES } from "@/rtvi.config";
+export type ClientParams = {
+  config: RTVIClientConfigOption[];
+  services: { [key: string]: string };
+};
 
 interface AppContextType {
   character: number;
   setCharacter: (value: number) => void;
   language: number;
   setLanguage: (value: number) => void;
+  clientParams: ClientParams;
+  setClientParams: (newParams: {
+    config?: RTVIClientConfigOption[];
+    services?: { [key: string]: string };
+  }) => void;
 }
 
 export const AppContext = createContext<AppContextType>({
@@ -17,6 +27,13 @@ export const AppContext = createContext<AppContextType>({
   language: 0,
   setLanguage: () => {
     throw new Error("setLanguage function must be overridden");
+  },
+  clientParams: {
+    config: defaultConfig as RTVIClientConfigOption[],
+    services: defaultServices as { [key: string]: string },
+  },
+  setClientParams: () => {
+    throw new Error("updateVoiceClientParams function must be overridden");
   },
 });
 AppContext.displayName = "AppContext";
@@ -30,10 +47,36 @@ export const AppProvider: React.FC<
 > = ({ children }) => {
   const [character, setCharacter] = useState<number>(0);
   const [language, setLanguage] = useState<number>(0);
+  const [clientParams, _setClientParams] = useState<ClientParams>({
+    config: defaultConfig as RTVIClientConfigOption[],
+    services: defaultServices as { [key: string]: string },
+  });
+
+  const setClientParams = useCallback(
+    (newParams: {
+      config?: RTVIClientConfigOption[];
+      services?: { [key: string]: string };
+    }) => {
+      _setClientParams((p) => ({
+        config: newParams.config ?? p.config,
+        services: newParams.services
+          ? { ...p.services, ...newParams.services }
+          : p.services,
+      }));
+    },
+    []
+  );
 
   return (
     <AppContext.Provider
-      value={{ character, setCharacter, language, setLanguage }}
+      value={{
+        character,
+        setCharacter,
+        language,
+        setLanguage,
+        clientParams,
+        setClientParams,
+      }}
     >
       {children}
     </AppContext.Provider>

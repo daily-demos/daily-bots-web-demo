@@ -1,5 +1,5 @@
-import React from "react";
 import { Book, Info } from "lucide-react";
+import React from "react";
 
 import { Button } from "./ui/button";
 
@@ -20,6 +20,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           Together Llama 3.1 &nbsp; 8B <br />
           Together Llama 3.1 &nbsp; 70B <br />
           Together Llama 3.1 &nbsp; 405B <br />
+          GPT-4o <br />
           GPT-4o mini
         </p>
 
