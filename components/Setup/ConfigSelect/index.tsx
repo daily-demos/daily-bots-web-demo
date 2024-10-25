@@ -246,7 +246,7 @@ export const ConfigSelect: React.FC<ConfigSelectProps> = ({
                 {!inSession && (
                   <>
                     <Label>Provider</Label>
-                    <div className="flex flex-row gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {llmProviders.map(({ value, label }) => (
                         <div
                           tabIndex={0}

@@ -75,6 +75,13 @@ export const defaultConfig = [
       { name: "voice", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
       { name: "model", value: LANGUAGES[0].tts_model },
       { name: "language", value: LANGUAGES[0].value },
+      {
+        name: "text_filter",
+        value: {
+          filter_code: false,
+          filter_tables: false,
+        },
+      },
     ],
   },
   {
@@ -128,6 +135,30 @@ export const LLM_MODEL_CHOICES = [
       {
         label: "Claude 3.5 Sonnet",
         value: "claude-3-5-sonnet-20240620",
+      },
+    ],
+  },
+  {
+    label: "Grok (x.ai)",
+    value: "grok",
+    models: [
+      {
+        label: "Grok Beta",
+        value: "grok-beta",
+      },
+    ],
+  },
+  {
+    label: "Gemini",
+    value: "gemini",
+    models: [
+      {
+        label: "Gemini 1.5 Flash",
+        value: "gemini-1.5-flash",
+      },
+      {
+        label: "Gemini 1.5 Pro",
+        value: "gemini-1.0-pro",
       },
     ],
   },

@@ -20,6 +20,8 @@ export async function POST(request: Request) {
     services: { ...defaultServices, ...services },
     api_keys: {
       openai: process.env.OPENAI_API_KEY,
+      grok: process.env.GROK_API_KEY,
+      gemini: process.env.GEMINI_API_KEY,
     },
     config: [...config],
     rtvi_client_version,
