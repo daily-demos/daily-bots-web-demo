@@ -22,7 +22,7 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           <br />
           Grok AI Beta
           <br />
-          Gemini 1.5 Flash, Gemini 1.5 Pro
+          Gemini 1.5 Flash, 1.0 Pro
         </p>
 
         <Button onClick={() => handleReady()}>Try Demo</Button>
