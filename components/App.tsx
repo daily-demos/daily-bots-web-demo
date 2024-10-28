@@ -21,6 +21,7 @@ const status_text = {
   initialized: "Start",
   authenticating: "Requesting bot...",
   connecting: "Connecting...",
+  disconnected: "Start",
 };
 
 export default function App() {
@@ -65,8 +66,10 @@ export default function App() {
     // Update app state based on voice client transport state.
     // We only need a subset of states to determine the ui state,
     // so this effect helps avoid excess inline conditionals.
+    console.log(transportState);
     switch (transportState) {
       case "initialized":
+      case "disconnected":
         setAppState("ready");
         break;
       case "authenticating":
