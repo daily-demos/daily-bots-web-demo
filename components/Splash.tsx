@@ -1,5 +1,5 @@
-import React from "react";
 import { Book, Info } from "lucide-react";
+import React from "react";
 
 import { Button } from "./ui/button";
 
@@ -15,12 +15,14 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
           Daily Bots demo
         </h1>
 
-        <p className="text-primary-500 text-xl font-semibold leading-relaxed">
-          Claude 3.5 Sonnet <br />
-          Together Llama 3.1 &nbsp; 8B <br />
-          Together Llama 3.1 &nbsp; 70B <br />
-          Together Llama 3.1 &nbsp; 405B <br />
-          GPT-4o mini
+        <p className="text-primary-500 text-lg font-semibold leading-relaxed">
+          Anthropic Claude 3.5 Sonnet <br />
+          Llama 3.1 8B, Llama 3.1 70B, Llama 3.1 405B <br />
+          Open AI GPT-4o, GPT-4o mini
+          <br />
+          Grok AI Beta
+          <br />
+          Gemini 1.5 Flash, 1.0 Pro
         </p>
 
         <Button onClick={() => handleReady()}>Try Demo</Button>

@@ -1,14 +1,14 @@
 export const BOT_READY_TIMEOUT = 15 * 1000; // 15 seconds
 
-export const defaultBotProfile = "voice_2024_08";
+export const defaultBotProfile = "voice_2024_10";
 export const defaultMaxDuration = 600;
 
 export const LANGUAGES = [
   {
     label: "English",
-    value: "en-US",
+    value: "en",
     tts_model: "sonic-english",
-    stt_model: "nova-2-conversationalai",
+    stt_model: "nova-2-general",
     default_voice: "79a125e8-cd45-4c13-8a67-188112f4dd22",
   },
   {
@@ -68,13 +68,20 @@ Your responses will converted to audio. Please do not include any special charac
 Start by briefly introducing yourself.`;
 
 export const defaultConfig = [
-  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.3 } }] },
+  { service: "vad", options: [{ name: "params", value: { stop_secs: 0.5 } }] },
   {
     service: "tts",
     options: [
       { name: "voice", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
       { name: "model", value: LANGUAGES[0].tts_model },
       { name: "language", value: LANGUAGES[0].value },
+      {
+        name: "text_filter",
+        value: {
+          filter_code: false,
+          filter_tables: false,
+        },
+      },
     ],
   },
   {
@@ -128,6 +135,30 @@ export const LLM_MODEL_CHOICES = [
       {
         label: "Claude 3.5 Sonnet",
         value: "claude-3-5-sonnet-20240620",
+      },
+    ],
+  },
+  {
+    label: "Grok (x.ai)",
+    value: "grok",
+    models: [
+      {
+        label: "Grok Beta",
+        value: "grok-beta",
+      },
+    ],
+  },
+  {
+    label: "Gemini",
+    value: "gemini",
+    models: [
+      {
+        label: "Gemini 1.5 Flash",
+        value: "gemini-1.5-flash",
+      },
+      {
+        label: "Gemini 1.5 Pro",
+        value: "gemini-1.0-pro",
       },
     ],
   },

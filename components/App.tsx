@@ -1,41 +1,44 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { Ear, Loader2 } from "lucide-react";
-import { VoiceError, VoiceEvent, VoiceMessage } from "realtime-ai";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { RTVIError, RTVIEvent, RTVIMessage } from "realtime-ai";
 import {
-  useVoiceClient,
-  useVoiceClientEvent,
-  useVoiceClientTransportState,
+  useRTVIClient,
+  useRTVIClientEvent,
+  useRTVIClientTransportState,
 } from "realtime-ai-react";
 
+import { AppContext } from "./context";
+import Session from "./Session";
+import { Configure } from "./Setup";
 import { Alert } from "./ui/alert";
 import { Button } from "./ui/button";
 import * as Card from "./ui/card";
-import Session from "./Session";
-import { Configure } from "./Setup";
 
 const status_text = {
   idle: "Initializing...",
-  initializing: "Initializing...",
   initialized: "Start",
   authenticating: "Requesting bot...",
   connecting: "Connecting...",
+  disconnected: "Start",
 };
 
 export default function App() {
-  const voiceClient = useVoiceClient()!;
-  const transportState = useVoiceClientTransportState();
+  const voiceClient = useRTVIClient()!;
+  const transportState = useRTVIClientTransportState();
 
   const [appState, setAppState] = useState<
     "idle" | "ready" | "connecting" | "connected"
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [startAudioOff, setStartAudioOff] = useState<boolean>(false);
+  const mountedRef = useRef<boolean>(false);
+  const { clientParams } = useContext(AppContext);
 
-  useVoiceClientEvent(
-    VoiceEvent.Error,
-    useCallback((message: VoiceMessage) => {
+  useRTVIClientEvent(
+    RTVIEvent.Error,
+    useCallback((message: RTVIMessage) => {
       const errorData = message.data as { error: string; fatal: boolean };
       if (!errorData.fatal) return;
       setError(errorData.error);
@@ -44,16 +47,29 @@ export default function App() {
 
   useEffect(() => {
     // Initialize local audio devices
-    if (!voiceClient || appState !== "idle") return;
+    if (!voiceClient || mountedRef.current) return;
+    mountedRef.current = true;
     voiceClient.initDevices();
   }, [appState, voiceClient]);
+
+  useEffect(() => {
+    voiceClient.params = {
+      ...voiceClient.params,
+      requestData: {
+        ...voiceClient.params.requestData,
+        ...clientParams,
+      },
+    };
+  }, [voiceClient, appState, clientParams]);
 
   useEffect(() => {
     // Update app state based on voice client transport state.
     // We only need a subset of states to determine the ui state,
     // so this effect helps avoid excess inline conditionals.
+    console.log(transportState);
     switch (transportState) {
       case "initialized":
+      case "disconnected":
         setAppState("ready");
         break;
       case "authenticating":
@@ -77,9 +93,9 @@ export default function App() {
       // Disable the mic until the bot has joined
       // to avoid interrupting the bot's welcome message
       voiceClient.enableMic(false);
-      await voiceClient.start();
+      await voiceClient.connect();
     } catch (e) {
-      setError((e as VoiceError).message || "Unknown error occured");
+      setError((e as RTVIError).message || "Unknown error occured");
       voiceClient.disconnect();
     }
   }
