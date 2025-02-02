@@ -16,6 +16,7 @@
     "deepmerge-ts": "^7.1.0",
     "lucide-react": "^0.378.0",
     "next": "14.2.5",
+    "node": "^23.7.0",
     "react": "^18",
     "react-dom": "^18",
     "react-sparklines": "^1.7.0",
