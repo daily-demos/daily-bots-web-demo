@@ -19,13 +19,7 @@ export function Header() {
           <a href="https://bots.daily.co" target="_blank" className={aCx}>
             Dashboard
           </a>
-          <a
-            href="https://github.com/daily-demos/daily-bots-web-demo"
-            target="_blank"
-            className={aCx}
-          >
-            Source code
-          </a>
+         
         </nav>
       </div>
       <ExpiryTimer />

@@ -24,26 +24,13 @@ export const Splash: React.FC<SplashProps> = ({ handleReady }) => {
         <div className="h-[1px] bg-primary-300 w-full" />
 
         <footer className="flex flex-col lg:gap-2">
-          <Button variant="light" asChild>
-            <a
-              href="https://www.daily.co/products/daily-bots/"
-              className="text-indigo-600"
-            >
-              <Info className="size-6" />
-              Learn more about Daily Bots
-            </a>
-          </Button>
+          
 
           <Button variant="light" asChild>
-            <a
-              href="https://github.com/daily-demos/daily-bots-web-demo/tree/khk/vision-for-launch"
-              className="text-indigo-600"
-            >
-              <Book className="size-6" />
-              Demo source code
-            </a>
+            
           </Button>
         </footer>
+        
       </div>
     </main>
   );
