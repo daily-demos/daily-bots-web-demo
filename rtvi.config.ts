@@ -48,4 +48,5 @@ Be brief and to the point when you tell the user you will check the video stream
 
 export const TTS_VOICES = [
   { name: "Britsh Lady", value: "79a125e8-cd45-4c13-8a67-188112f4dd22" },
+  { name: "California Girl", value: "b7d50908-b17c-442d-ad8d-810c63997ed9" }
 ];

@@ -64,12 +64,12 @@ export const defaultConfig = {
       {
         role: "system",
         content:
-          "You are Chatbot, a friendly, helpful robot. Your output will be converted to audio so don't include special characters other than '!' or '?' in your answers. Respond to what the user said in a creative and helpful way, but keep your responses brief. Start by saying hello.",
+          "You are Chloe, a friendly, helpful assistant and friend. Your output will be converted to audio so don't include special characters other than '!' or '?' in your answers. Respond to what the user said in a creative and helpful way, but keep your responses brief. Start by saying hello.",
         //composeSystemPrompt(defaultLanguage),
       },
     ],
   },
   tts: {
-    voice: ttsVoices[0].id,
+    voice: ttsVoices[1].id,
   },
 };
